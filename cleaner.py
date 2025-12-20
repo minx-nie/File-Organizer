@@ -6,12 +6,9 @@ Author: Minx-nie
 import os
 import shutil
 import logging
+import argparse
 
 # ================= CẤU HÌNH =================
-
-FOLDER_TO_CLEAN = r"C:\Users\TenUserCuaBan\Downloads"
-
-DRY_RUN = True 
 
 LOG_FILE = "file_organizer.log"
 
@@ -34,6 +31,25 @@ logging.basicConfig(
     encoding="utf-8"
 )
 
+# ================= ARGUMENT PARSER =================
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description="Simple file organizer for cleaning up folders"
+    )
+    parser.add_argument(
+        "path",
+        nargs="?",
+        default=os.path.join(os.path.expanduser("~"), "Downloads"),
+        help="Folder to clean (default: ~/Downloads)"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Run without actually moving files"
+    )
+    return parser.parse_args()
+
 # ================= HÀM HỖ TRỢ =================
 
 def get_unique_filename(folder, filename):
@@ -53,24 +69,25 @@ def get_category(extension):
 
 # ================= CHƯƠNG TRÌNH CHÍNH =================
 
-def clean_folder():
-    if not os.path.isdir(FOLDER_TO_CLEAN):
-        print(f"Lỗi: Thư mục không tồn tại: {FOLDER_TO_CLEAN}")
-        logging.error(f"Folder not found: {FOLDER_TO_CLEAN}")
+def clean_folder(folder_to_clean, dry_run):
+    if not os.path.isdir(folder_to_clean):
+        print(f"Lỗi: Thư mục không tồn tại: {folder_to_clean}")
+        logging.error(f"Folder not found: {folder_to_clean}")
         return
 
-    print(f"--- Bắt đầu dọn dẹp: {FOLDER_TO_CLEAN} ---")
-    print(f"--- Chế độ: {'DRY RUN (Chạy thử)' if DRY_RUN else 'REAL RUN (Chạy thật)'} ---")
+    print(f"--- Bắt đầu dọn dẹp: {folder_to_clean} ---")
+    print(f"--- Chế độ: {'DRY RUN (Chạy thử)' if dry_run else 'REAL RUN (Chạy thật)'} ---")
 
-    files = os.listdir(FOLDER_TO_CLEAN)
+    files = os.listdir(folder_to_clean)
     moved_count = 0
 
     for filename in files:
         try:
-            original_path = os.path.join(FOLDER_TO_CLEAN, filename)
+            original_path = os.path.join(folder_to_clean, filename)
 
             if os.path.isdir(original_path) or filename.startswith('.'):
                 continue
+
             if filename in [os.path.basename(__file__), LOG_FILE]:
                 continue
 
@@ -78,11 +95,11 @@ def clean_folder():
             extension = extension.lower()
 
             category = get_category(extension)
-            target_folder = os.path.join(FOLDER_TO_CLEAN, category)
+            target_folder = os.path.join(folder_to_clean, category)
 
-            if not os.path.exists(target_folder) and not DRY_RUN:
+            if not os.path.exists(target_folder) and not dry_run:
                 os.makedirs(target_folder)
-            
+
             if os.path.exists(target_folder):
                 new_filename = get_unique_filename(target_folder, filename)
             else:
@@ -90,19 +107,24 @@ def clean_folder():
 
             destination_path = os.path.join(target_folder, new_filename)
 
-            if DRY_RUN:
+            if dry_run:
                 print(f"[Thử nghiệm] {filename} -> {category}/{new_filename}")
             else:
                 shutil.move(original_path, destination_path)
-                print(f"✅ Đã chuyển: {filename} -> {category}/{new_filename}")
-                logging.info(f"Moved: {filename} -> {category}/{new_filename}")
+                print(f"Đã chuyển: {filename} -> {category}/{new_filename}")
+                logging.info(
+                    f"Moved: {original_path} -> {destination_path}"
+                )
                 moved_count += 1
 
         except Exception as e:
-            print(f"⚠️ Lỗi xử lý file {filename}: {e}")
+            print(f"Lỗi xử lý file {filename}: {e}")
             logging.error(f"Error processing {filename}: {e}")
 
     print(f"--- Hoàn tất! Đã xử lý {moved_count} files. ---")
 
+# ================= ENTRY POINT =================
+
 if __name__ == "__main__":
-    clean_folder()
+    args = parse_arguments()
+    clean_folder(args.path, args.dry_run)
