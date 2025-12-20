@@ -10,6 +10,7 @@ import argparse
 import json
 import mimetypes
 from datetime import datetime
+import sys
 
 # ================= CONSTANTS =================
 
@@ -225,10 +226,12 @@ def clean_folder(folder_to_clean, dry_run, confirm):
         print("=" * 60)
         print("[!]  DRY RUN MODE ENABLED - NO FILES WILL BE MOVED")
         print("=" * 60)
+    
+    current_script = os.path.basename(sys.argv[0])
+    skip_folders = {os.path.join(folder_to_clean, c) for c in categories}
 
     for root, _, files in os.walk(folder_to_clean):
-        relative_path = os.path.relpath(root, folder_to_clean)
-        if relative_path.split(os.sep)[0] in categories:
+        if os.path.abspath(root) in skip_folders:
             continue
 
         for filename in files:
