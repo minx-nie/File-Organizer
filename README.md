@@ -10,60 +10,67 @@
 
 ## 🇬🇧 English
 
-### About The Project
-**File Organizer** is a simple CLI tool that helps you clean up cluttered folders by automatically organizing files into categorized directories.
+### 📌 About
 
-⚠️ **Important:**  
-This tool now uses **command-line arguments** instead of hard-coded configuration inside the script.
+**File Organizer** is a simple Python CLI tool that helps you clean up cluttered folders by automatically sorting files into categorized directories.
 
-#### ✨ Key Features
-- 📂 **Smart Categorization** by file extension
-- 🛡️ **Dry Run Mode (default-safe):** Preview actions before moving files
-- 🧾 **Command Line Interface (CLI):** No need to edit the source code
-- 📝 **Detailed Logging:** All actions are recorded in `file_organizer.log`
-- ⚡ **Duplicate Handling:** Automatically renames files to avoid overwrite
+This project focuses on **safety**, **simplicity**, and **ease of use** — no configuration inside the code is required.
 
 ---
 
-### 🛠️ Installation
+### ✨ Features
 
-1. **Prerequisite:** Ensure you have Python installed (v3.6 or later).
-2. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/Minx-nie/File-Organizer.git](https://github.com/Minx-nie/File-Organizer.git)
+* 📂 Automatic file categorization by extension
+* 🛡️ Dry Run mode (preview before moving files)
+* 🧾 Command Line Interface (CLI)
+* 📝 Action logging to `file_organizer.log`
+* ⚡ Safe handling of duplicate filenames
 
-```
+---
 
-3. **Navigate to the folder:**
+### 🧰 Requirements
+
+* Python **3.8+**
+* No third-party libraries required
+
+---
+
+### 🚀 Installation
+
+Clone the repository:
+
 ```bash
-cd File-Organizer
-
+git clone https://github.com/Minx-nie/desktop-cleaner.git
+cd desktop-cleaner
 ```
 
-### 🚀 Usage
+---
 
-#### Default run (real move)
+### ▶️ Usage
+
+#### 1️⃣ Default run (real move)
+
+Cleans the **Downloads** folder and moves files for real:
+
 ```bash
 python cleaner.py
-````
-
-✔ Cleans your **Downloads** folder and moves files for real.
+```
 
 ---
 
-#### Dry Run (recommended first)
+#### 2️⃣ Dry Run (recommended first)
+
+Preview all changes **without moving files**:
 
 ```bash
 python cleaner.py --dry-run
 ```
 
-✔ Shows what would happen
-❌ Does NOT move any files
-⚠️ A warning banner will be displayed
+A warning banner will be displayed to indicate Dry Run mode.
 
 ---
 
-#### Custom folder
+#### 3️⃣ Clean a custom folder
 
 ```bash
 python cleaner.py "D:\MyFolder"
@@ -71,7 +78,7 @@ python cleaner.py "D:\MyFolder"
 
 ---
 
-#### Custom folder + Dry Run
+#### 4️⃣ Custom folder + Dry Run
 
 ```bash
 python cleaner.py "D:\MyFolder" --dry-run
@@ -79,18 +86,34 @@ python cleaner.py "D:\MyFolder" --dry-run
 
 ---
 
-### 📌 Notes
+### 📁 File Categories
 
-* Category folders will be created automatically.
-* Files with duplicate names will be auto-renamed.
-* Hidden files and folders are ignored.
+Files are organized based on their extensions into folders such as:
+
+* Images
+* Documents
+* Archives
+* Installers
+* Videos
+* Music
+* Code
+* Others
 
 ---
 
-#### 📄 License & Author
+### ⚠️ Notes
+
+* Category folders are created automatically if they do not exist
+* Hidden files and directories are ignored
+* Files are never overwritten — duplicates are auto-renamed
+
+---
+
+### 📄 License
 
 MIT License
-Author: Minx-nie
+
+Author: **Minx-nie**
 
 ---
 
@@ -98,66 +121,67 @@ Author: Minx-nie
 
 ## 🇻🇳 Tiếng Việt
 
-### Giới thiệu
+### 📌 Giới thiệu
 
-**File Organizer** là một tool dòng lệnh (CLI) giúp bạn dọn dẹp thư mục lộn xộn bằng cách tự động phân loại file theo đuôi mở rộng.
+**File Organizer** là một công cụ Python chạy bằng dòng lệnh (CLI) giúp bạn dọn dẹp thư mục lộn xộn bằng cách tự động phân loại file theo đuôi mở rộng.
 
-⚠️ **Lưu ý quan trọng:**
-Tool **không còn chỉnh sửa cấu hình trong code**. Mọi thao tác đều thực hiện qua **command line**.
-
-#### ✨ Tính năng chính
-
-* 📂 **Phân loại thông minh** theo loại file
-* 🛡️ **Dry Run (khuyến nghị chạy trước):** Xem trước kết quả mà không di chuyển file
-* 🧾 **CLI thân thiện:** Không cần mở file `.py` để chỉnh sửa
-* 📝 **Ghi log chi tiết:** Lưu toàn bộ lịch sử vào `file_organizer.log`
-* ⚡ **Tự xử lý trùng tên file**
+Tool được thiết kế với tiêu chí **an toàn**, **đơn giản** và **dễ sử dụng** — không cần chỉnh sửa code.
 
 ---
 
+### ✨ Tính năng
 
+* 📂 Tự động phân loại file
+* 🛡️ Chế độ Dry Run (xem trước kết quả)
+* 🧾 Chạy bằng dòng lệnh (CLI)
+* 📝 Ghi log chi tiết vào `file_organizer.log`
+* ⚡ Tự xử lý file trùng tên
 
-### 🛠️ Cài đặt
+---
 
-1. **Yêu cầu:** Máy tính đã cài sẵn Python (bản 3.6 trở lên).
-2. **Tải code về máy:**
-   ```bash
-   git clone [https://github.com/Minx-nie/File-Organizer.git](https://github.com/Minx-nie/File-Organizer.git)
+### 🧰 Yêu cầu
 
-```
+* Python **3.8 trở lên**
+* Không cần cài thêm thư viện
 
-3. **Truy cập vào thư mục:**
+---
+
+### 🚀 Cài đặt
+
+Clone project về máy:
+
 ```bash
-cd File-Organizer
-
+git clone https://github.com/Minx-nie/desktop-cleaner.git
+cd desktop-cleaner
 ```
 
-### 🚀 Cách sử dụng
+---
 
-#### Chạy thật (mặc định)
+### ▶️ Cách sử dụng
+
+#### 1️⃣ Chạy thật (mặc định)
+
+Dọn thư mục **Downloads** và di chuyển file thật:
 
 ```bash
 python cleaner.py
 ```
 
-✔ Dọn thư mục **Downloads**
-⚠️ File sẽ được di chuyển thật
-
 ---
 
-#### Chạy thử (an toàn)
+#### 2️⃣ Chạy thử (khuyến nghị)
+
+Xem trước những gì sẽ xảy ra **mà không di chuyển file**:
 
 ```bash
 python cleaner.py --dry-run
 ```
 
-✔ Chỉ hiển thị kết quả
-❌ Không di chuyển file
-⚠️ Có banner cảnh báo DRY RUN
+Sẽ có banner cảnh báo đang ở chế độ Dry Run.
 
 ---
 
-#### Chọn thư mục khác
+#### 3️⃣ Dọn thư mục khác
 
 ```bash
 python cleaner.py "D:\MyFolder"
@@ -165,7 +189,7 @@ python cleaner.py "D:\MyFolder"
 
 ---
 
-#### Chọn thư mục + chạy thử
+#### 4️⃣ Thư mục khác + chạy thử
 
 ```bash
 python cleaner.py "D:\MyFolder" --dry-run
@@ -173,17 +197,22 @@ python cleaner.py "D:\MyFolder" --dry-run
 
 ---
 
-### 📌 Ghi chú
+### 📁 Các nhóm file
 
-* Tool sẽ tự tạo thư mục phân loại nếu chưa tồn tại
-* File trùng tên sẽ được tự động đổi tên
+File sẽ được đưa vào các thư mục:
+Images, Documents, Archives, Installers, Videos, Music, Code và Others.
+
+---
+
+### ⚠️ Lưu ý
+
+* Tool tự tạo thư mục phân loại nếu chưa tồn tại
+* Không ghi đè file — file trùng tên sẽ được đổi tên tự động
 * Bỏ qua file ẩn và thư mục con
 
 ---
 
-#### 📄 Bản quyền & Tác giả
+### 📄 Bản quyền
 
-MIT License
-Tác giả: Minx-nie
-
-
+Giấy phép MIT
+Tác giả: **Minx-nie**
