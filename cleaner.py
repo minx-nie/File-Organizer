@@ -9,8 +9,6 @@ import logging
 import argparse
 import json
 
-# ================= CONSTANTS =================
-
 LOG_FILE = "file_organizer.log"
 CONFIG_FILE = "categories.json"
 
@@ -24,8 +22,6 @@ DEFAULT_CATEGORIES = {
     "Code": [".py", ".js", ".html", ".css", ".cpp", ".java", ".json", ".xml"]
 }
 
-# ================= LOGGING =================
-
 logging.basicConfig(
     filename=LOG_FILE,
     level=logging.INFO,
@@ -33,11 +29,9 @@ logging.basicConfig(
     encoding="utf-8"
 )
 
-# ================= ARGUMENT PARSER =================
-
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description="Recursive file organizer with dry-run and JSON config support"
+        description="Recursive file organizer with dry-run, config and summary report"
     )
     parser.add_argument(
         "path",
@@ -52,23 +46,14 @@ def parse_arguments():
     )
     return parser.parse_args()
 
-# ================= CONFIG =================
-
 def load_categories(config_path=CONFIG_FILE):
     if os.path.exists(config_path):
         try:
             with open(config_path, "r", encoding="utf-8") as f:
-                categories = json.load(f)
-            print(f"✔ Loaded categories from {config_path}")
-            return categories
+                return json.load(f)
         except Exception as e:
-            print(f"⚠️ Failed to load {config_path}, using defaults: {e}")
             logging.warning(f"Invalid config file: {e}")
-
-    print("ℹ️ Using default file categories")
     return DEFAULT_CATEGORIES
-
-# ================= HELPERS =================
 
 def get_unique_filename(folder, filename):
     name, ext = os.path.splitext(filename)
@@ -85,73 +70,81 @@ def get_category(extension, categories):
             return category
     return "Others"
 
-# ================= MAIN LOGIC =================
+def print_summary(summary, dry_run):
+    print("\n" + "=" * 40)
+    print("📊 SUMMARY REPORT")
+    print("=" * 40)
+    print(f"Mode        : {'DRY RUN' if dry_run else 'REAL RUN'}")
+    print(f"Total files : {summary['total']}")
+    print(f"Moved files : {summary['moved']}")
+    print(f"Renamed     : {summary['renamed']}")
+    print("\nBy category:")
+    for category, count in summary["by_category"].items():
+        print(f"  - {category}: {count}")
+    print("=" * 40)
 
 def clean_folder(folder_to_clean, dry_run):
     if not os.path.isdir(folder_to_clean):
         print(f"❌ Folder not found: {folder_to_clean}")
-        logging.error(f"Folder not found: {folder_to_clean}")
         return
 
     categories = load_categories()
 
-    print(f"\n--- Cleaning folder (recursive): {folder_to_clean} ---")
+    summary = {
+        "total": 0,
+        "moved": 0,
+        "renamed": 0,
+        "by_category": {}
+    }
+
     if dry_run:
         print("=" * 60)
         print("⚠️  DRY RUN MODE ENABLED - NO FILES WILL BE MOVED")
         print("=" * 60)
 
-    moved_count = 0
-
     for root, _, files in os.walk(folder_to_clean):
-        # Skip category folders to avoid infinite loop
         relative_path = os.path.relpath(root, folder_to_clean)
         if relative_path.split(os.sep)[0] in categories:
             continue
 
         for filename in files:
-            try:
-                if filename.startswith("."):
-                    continue
+            if filename.startswith("."):
+                continue
 
-                original_path = os.path.join(root, filename)
+            original_path = os.path.join(root, filename)
+            if filename in [os.path.basename(__file__), LOG_FILE]:
+                continue
 
-                if filename in [os.path.basename(__file__), LOG_FILE]:
-                    continue
+            _, extension = os.path.splitext(filename)
+            extension = extension.lower()
 
-                _, extension = os.path.splitext(filename)
-                extension = extension.lower()
+            category = get_category(extension, categories)
+            summary["total"] += 1
+            summary["by_category"].setdefault(category, 0)
+            summary["by_category"][category] += 1
 
-                category = get_category(extension, categories)
-                target_folder = os.path.join(folder_to_clean, category)
+            target_folder = os.path.join(folder_to_clean, category)
+            if not os.path.exists(target_folder) and not dry_run:
+                os.makedirs(target_folder)
 
-                if not os.path.exists(target_folder) and not dry_run:
-                    os.makedirs(target_folder)
+            new_filename = (
+                get_unique_filename(target_folder, filename)
+                if os.path.exists(target_folder)
+                else filename
+            )
 
-                new_filename = (
-                    get_unique_filename(target_folder, filename)
-                    if os.path.exists(target_folder)
-                    else filename
-                )
+            if new_filename != filename:
+                summary["renamed"] += 1
 
-                destination_path = os.path.join(target_folder, new_filename)
+            destination_path = os.path.join(target_folder, new_filename)
 
-                if dry_run:
-                    print(f"[DRY RUN] {original_path} -> {category}/{new_filename}")
-                    logging.info(f"[DRY RUN] {original_path} -> {destination_path}")
-                else:
-                    shutil.move(original_path, destination_path)
-                    print(f"✔ Moved: {original_path} -> {category}/{new_filename}")
-                    logging.info(f"Moved: {original_path} -> {destination_path}")
-                    moved_count += 1
+            if dry_run:
+                print(f"[DRY RUN] {original_path} -> {category}/{new_filename}")
+            else:
+                shutil.move(original_path, destination_path)
+                summary["moved"] += 1
 
-            except Exception as e:
-                print(f"⚠️ Error processing {filename}: {e}")
-                logging.error(f"Error processing {filename}: {e}")
-
-    print(f"\n--- Done! {moved_count} files processed. ---")
-
-# ================= ENTRY POINT =================
+    print_summary(summary, dry_run)
 
 if __name__ == "__main__":
     args = parse_arguments()

@@ -26,14 +26,17 @@ This project focuses on **safety**, **simplicity**, and **ease of use** — no c
 * 📝 Action logging to `file_organizer.log`
 * ⚡ Safe handling of duplicate filenames
 
----
 
 ### 🧰 Requirements
 
 * Python **3.8+**
 * No third-party libraries required
 
----
+
+### 📊 Summary Report
+
+After the tool finishes running, a summary report will be displayed in the terminal. This helps you quickly verify what the tool has done without checking logs manually.
+
 
 ### 🚀 Installation
 
@@ -56,8 +59,6 @@ Cleans the **Downloads** folder and moves files for real:
 python cleaner.py
 ```
 
----
-
 #### 2️⃣ Dry Run (recommended first)
 
 Preview all changes **without moving files**:
@@ -68,15 +69,11 @@ python cleaner.py --dry-run
 
 A warning banner will be displayed to indicate Dry Run mode.
 
----
-
 #### 3️⃣ Clean a custom folder
 
 ```bash
 python cleaner.py "D:\MyFolder"
 ```
-
----
 
 #### 4️⃣ Custom folder + Dry Run
 
@@ -148,14 +145,17 @@ Tool được thiết kế với tiêu chí **an toàn**, **đơn giản** và *
 * 📝 Ghi log chi tiết vào `file_organizer.log`
 * ⚡ Tự xử lý file trùng tên
 
----
 
 ### 🧰 Yêu cầu
 
 * Python **3.8 trở lên**
 * Không cần cài thêm thư viện
 
----
+
+### 📊 Báo cáo tổng kết
+
+Sau khi tool chạy xong, một báo cáo tổng kết sẽ được in ra terminal. Phần này giúp bạn kiểm tra nhanh kết quả mà không cần mở file log.
+
 
 ### 🚀 Cài đặt
 
@@ -178,8 +178,6 @@ Dọn thư mục **Downloads** và di chuyển file thật:
 python cleaner.py
 ```
 
----
-
 #### 2️⃣ Chạy thử (khuyến nghị)
 
 Xem trước những gì sẽ xảy ra **mà không di chuyển file**:
@@ -190,15 +188,11 @@ python cleaner.py --dry-run
 
 Sẽ có banner cảnh báo đang ở chế độ Dry Run.
 
----
-
 #### 3️⃣ Dọn thư mục khác
 
 ```bash
 python cleaner.py "D:\MyFolder"
 ```
-
----
 
 #### 4️⃣ Thư mục khác + chạy thử
 
