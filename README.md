@@ -101,6 +101,15 @@ Files are organized based on their extensions into folders such as:
 
 ---
 
+### ⚙️ Custom Categories (Optional)
+
+You can customize file categories by editing `categories.json`.
+No code changes are required.
+
+If the file is missing or invalid, the tool will use default categories.
+
+---
+
 ### ⚠️ Notes
 
 * Category folders are created automatically if they do not exist
@@ -203,6 +212,15 @@ python cleaner.py "D:\MyFolder" --dry-run
 
 File sẽ được đưa vào các thư mục:
 Images, Documents, Archives, Installers, Videos, Music, Code và Others.
+
+---
+
+### ⚙️ Tuỳ chỉnh phân loại (Không bắt buộc)
+
+Bạn có thể tuỳ chỉnh các nhóm file bằng cách sửa file `categories.json`
+mà không cần chỉnh sửa code.
+
+Nếu file không tồn tại hoặc bị lỗi, tool sẽ dùng cấu hình mặc định.
 
 ---
 

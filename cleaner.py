@@ -1,5 +1,5 @@
 """
-Project: Dọn dẹp máy tính (Improved File Organizer)
+Project: Dọn dẹp máy tính (File Organizer)
 Author: Minx-nie
 """
 
@@ -7,12 +7,14 @@ import os
 import shutil
 import logging
 import argparse
+import json
 
-# ================= CẤU HÌNH =================
+# ================= CONSTANTS =================
 
 LOG_FILE = "file_organizer.log"
+CONFIG_FILE = "categories.json"
 
-FILE_CATEGORIES = {
+DEFAULT_CATEGORIES = {
     "Images": [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"],
     "Documents": [".pdf", ".docx", ".doc", ".txt", ".xlsx", ".pptx", ".csv"],
     "Installers": [".exe", ".msi", ".dmg", ".iso"],
@@ -35,7 +37,7 @@ logging.basicConfig(
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description="Recursive file organizer for cleaning up folders"
+        description="Recursive file organizer with dry-run and JSON config support"
     )
     parser.add_argument(
         "path",
@@ -46,11 +48,27 @@ def parse_arguments():
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Run without actually moving files (simulation)"
+        help="Simulate actions without moving files"
     )
     return parser.parse_args()
 
-# ================= HÀM HỖ TRỢ =================
+# ================= CONFIG =================
+
+def load_categories(config_path=CONFIG_FILE):
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                categories = json.load(f)
+            print(f"✔ Loaded categories from {config_path}")
+            return categories
+        except Exception as e:
+            print(f"⚠️ Failed to load {config_path}, using defaults: {e}")
+            logging.warning(f"Invalid config file: {e}")
+
+    print("ℹ️ Using default file categories")
+    return DEFAULT_CATEGORIES
+
+# ================= HELPERS =================
 
 def get_unique_filename(folder, filename):
     name, ext = os.path.splitext(filename)
@@ -61,24 +79,26 @@ def get_unique_filename(folder, filename):
         counter += 1
     return new_name
 
-def get_category(extension):
-    for category, extensions in FILE_CATEGORIES.items():
+def get_category(extension, categories):
+    for category, extensions in categories.items():
         if extension in extensions:
             return category
     return "Others"
 
-# ================= CHƯƠNG TRÌNH CHÍNH =================
+# ================= MAIN LOGIC =================
 
 def clean_folder(folder_to_clean, dry_run):
     if not os.path.isdir(folder_to_clean):
-        print(f"Lỗi: Thư mục không tồn tại: {folder_to_clean}")
+        print(f"❌ Folder not found: {folder_to_clean}")
         logging.error(f"Folder not found: {folder_to_clean}")
         return
 
-    print(f"--- Bắt đầu dọn dẹp (Recursive): {folder_to_clean} ---")
+    categories = load_categories()
+
+    print(f"\n--- Cleaning folder (recursive): {folder_to_clean} ---")
     if dry_run:
         print("=" * 60)
-        print("⚠️  DRY RUN MODE ENABLED - No files will be moved! ⚠️")
+        print("⚠️  DRY RUN MODE ENABLED - NO FILES WILL BE MOVED")
         print("=" * 60)
 
     moved_count = 0
@@ -86,12 +106,12 @@ def clean_folder(folder_to_clean, dry_run):
     for root, _, files in os.walk(folder_to_clean):
         # Skip category folders to avoid infinite loop
         relative_path = os.path.relpath(root, folder_to_clean)
-        if relative_path.split(os.sep)[0] in FILE_CATEGORIES:
+        if relative_path.split(os.sep)[0] in categories:
             continue
 
         for filename in files:
             try:
-                if filename.startswith('.'):
+                if filename.startswith("."):
                     continue
 
                 original_path = os.path.join(root, filename)
@@ -102,7 +122,7 @@ def clean_folder(folder_to_clean, dry_run):
                 _, extension = os.path.splitext(filename)
                 extension = extension.lower()
 
-                category = get_category(extension)
+                category = get_category(extension, categories)
                 target_folder = os.path.join(folder_to_clean, category)
 
                 if not os.path.exists(target_folder) and not dry_run:
@@ -117,19 +137,19 @@ def clean_folder(folder_to_clean, dry_run):
                 destination_path = os.path.join(target_folder, new_filename)
 
                 if dry_run:
-                    print(f"[Thử nghiệm] {original_path} -> {category}/{new_filename}")
+                    print(f"[DRY RUN] {original_path} -> {category}/{new_filename}")
                     logging.info(f"[DRY RUN] {original_path} -> {destination_path}")
                 else:
                     shutil.move(original_path, destination_path)
-                    print(f"Đã chuyển: {original_path} -> {category}/{new_filename}")
+                    print(f"✔ Moved: {original_path} -> {category}/{new_filename}")
                     logging.info(f"Moved: {original_path} -> {destination_path}")
                     moved_count += 1
 
             except Exception as e:
-                print(f"Lỗi xử lý file {filename}: {e}")
+                print(f"⚠️ Error processing {filename}: {e}")
                 logging.error(f"Error processing {filename}: {e}")
 
-    print(f"--- Hoàn tất! Đã xử lý {moved_count} files. ---")
+    print(f"\n--- Done! {moved_count} files processed. ---")
 
 # ================= ENTRY POINT =================
 
