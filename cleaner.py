@@ -185,6 +185,8 @@ def rollback(timestamp=None):
         src = move["src"]
         if os.path.exists(dst):
             os.makedirs(os.path.dirname(src), exist_ok=True)
+            if os.path.exists(src):
+                src = get_unique_filename(os.path.dirname(src), os.path.basename(src))
             shutil.move(dst, src)
             restored += 1
 
