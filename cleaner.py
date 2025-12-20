@@ -35,7 +35,7 @@ logging.basicConfig(
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description="Simple file organizer for cleaning up folders"
+        description="Recursive file organizer for cleaning up folders"
     )
     parser.add_argument(
         "path",
@@ -75,54 +75,59 @@ def clean_folder(folder_to_clean, dry_run):
         logging.error(f"Folder not found: {folder_to_clean}")
         return
 
-    print(f"--- Bắt đầu dọn dẹp: {folder_to_clean} ---")
+    print(f"--- Bắt đầu dọn dẹp (Recursive): {folder_to_clean} ---")
     if dry_run:
-        print("="*60)
-        print("  DRY RUN MODE ENABLED - No files will be moved! ")
-        print("="*60)
-    print(f"--- Chế độ: {'DRY RUN (Chạy thử)' if dry_run else 'REAL RUN (Chạy thật)'} ---")
+        print("=" * 60)
+        print("⚠️  DRY RUN MODE ENABLED - No files will be moved! ⚠️")
+        print("=" * 60)
 
-    files = os.listdir(folder_to_clean)
     moved_count = 0
 
-    for filename in files:
-        try:
-            original_path = os.path.join(folder_to_clean, filename)
+    for root, _, files in os.walk(folder_to_clean):
+        # Skip category folders to avoid infinite loop
+        relative_path = os.path.relpath(root, folder_to_clean)
+        if relative_path.split(os.sep)[0] in FILE_CATEGORIES:
+            continue
 
-            if os.path.isdir(original_path) or filename.startswith('.'):
-                continue
+        for filename in files:
+            try:
+                if filename.startswith('.'):
+                    continue
 
-            if filename in [os.path.basename(__file__), LOG_FILE]:
-                continue
+                original_path = os.path.join(root, filename)
 
-            _, extension = os.path.splitext(filename)
-            extension = extension.lower()
+                if filename in [os.path.basename(__file__), LOG_FILE]:
+                    continue
 
-            category = get_category(extension)
-            target_folder = os.path.join(folder_to_clean, category)
+                _, extension = os.path.splitext(filename)
+                extension = extension.lower()
 
-            if not os.path.exists(target_folder) and not dry_run:
-                os.makedirs(target_folder)
+                category = get_category(extension)
+                target_folder = os.path.join(folder_to_clean, category)
 
-            if os.path.exists(target_folder):
-                new_filename = get_unique_filename(target_folder, filename)
-            else:
-                new_filename = filename
+                if not os.path.exists(target_folder) and not dry_run:
+                    os.makedirs(target_folder)
 
-            destination_path = os.path.join(target_folder, new_filename)
+                new_filename = (
+                    get_unique_filename(target_folder, filename)
+                    if os.path.exists(target_folder)
+                    else filename
+                )
 
-            if dry_run:
-                print(f"[Thử nghiệm] {filename} -> {category}/{new_filename}")
-                logging.info(f"[DRY RUN] {filename} -> {category}/{new_filename}")
-            else:
-                shutil.move(original_path, destination_path)
-                print(f"Đã chuyển: {filename} -> {category}/{new_filename}")
-                logging.info(f"Moved: {original_path} -> {destination_path}")
-                moved_count += 1
+                destination_path = os.path.join(target_folder, new_filename)
 
-        except Exception as e:
-            print(f"Lỗi xử lý file {filename}: {e}")
-            logging.error(f"Error processing {filename}: {e}")
+                if dry_run:
+                    print(f"[Thử nghiệm] {original_path} -> {category}/{new_filename}")
+                    logging.info(f"[DRY RUN] {original_path} -> {destination_path}")
+                else:
+                    shutil.move(original_path, destination_path)
+                    print(f"Đã chuyển: {original_path} -> {category}/{new_filename}")
+                    logging.info(f"Moved: {original_path} -> {destination_path}")
+                    moved_count += 1
+
+            except Exception as e:
+                print(f"Lỗi xử lý file {filename}: {e}")
+                logging.error(f"Error processing {filename}: {e}")
 
     print(f"--- Hoàn tất! Đã xử lý {moved_count} files. ---")
 

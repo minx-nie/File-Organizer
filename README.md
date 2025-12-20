@@ -106,6 +106,8 @@ Files are organized based on their extensions into folders such as:
 * Category folders are created automatically if they do not exist
 * Hidden files and directories are ignored
 * Files are never overwritten — duplicates are auto-renamed
+* The tool scans subfolders recursively but keeps the folder structure intact.
+
 
 ---
 
@@ -209,6 +211,8 @@ Images, Documents, Archives, Installers, Videos, Music, Code và Others.
 * Tool tự tạo thư mục phân loại nếu chưa tồn tại
 * Không ghi đè file — file trùng tên sẽ được đổi tên tự động
 * Bỏ qua file ẩn và thư mục con
+* Tool quét toàn bộ thư mục con nhưng không xóa cấu trúc thư mục.
+
 
 ---
 
