@@ -1,6 +1,14 @@
 # 📂 File Organizer
 
 <div align="center">
+  <img src="https://img.shields.io/badge/Python-3.8+-blue?logo=python" alt="Python 3.8+">
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="License MIT">
+  <img src="https://img.shields.io/badge/Status-Stable-brightgreen" alt="Status Stable">
+</div>
+
+---
+
+<div align="center">
 🇬🇧 [English](#english) | 🇻🇳 [Tiếng Việt](#vietnamese)
 </div>
 
@@ -12,35 +20,37 @@
 
 ### 📌 About
 
-**File Organizer** is a simple Python CLI tool that helps you clean up cluttered folders by automatically sorting files into categorized directories.
+**File Organizer** is a Python CLI tool that automatically sorts files in cluttered folders into categorized directories.
 
-This project focuses on **safety**, **simplicity**, and **ease of use** — no configuration inside the code is required.
+**Key highlights:**
+
+* Safety first — Dry Run mode to preview changes
+* Rollback last run using `move_history.json`
+* Summary report with processed, moved, and renamed files
+* Configurable categories via `categories.json`
 
 ---
 
 ### ✨ Features
 
 * 📂 Automatic file categorization by extension
-* 🛡️ Dry Run mode (preview before moving files)
-* 🧾 Command Line Interface (CLI)
-* 📝 Action logging to `file_organizer.log`
+* 🛡️ Dry Run mode (preview without moving files)
+* ↩️ Rollback / Undo last run
+* 🧾 CLI with clear summary report
+* 📝 Logging in `file_organizer.log`
 * ⚡ Safe handling of duplicate filenames
+* ⚙️ Configurable file categories via JSON
 
+---
 
 ### 🧰 Requirements
 
 * Python **3.8+**
-* No third-party libraries required
+* No third-party libraries
 
-
-### 📊 Summary Report
-
-After the tool finishes running, a summary report will be displayed in the terminal. This helps you quickly verify what the tool has done without checking logs manually.
-
+---
 
 ### 🚀 Installation
-
-Clone the repository:
 
 ```bash
 git clone https://github.com/Minx-nie/desktop-cleaner.git
@@ -51,76 +61,53 @@ cd desktop-cleaner
 
 ### ▶️ Usage
 
-#### 1️⃣ Default run (real move)
-
-Cleans the **Downloads** folder and moves files for real:
-
-```bash
-python cleaner.py
-```
-
-#### 2️⃣ Dry Run (recommended first)
-
-Preview all changes **without moving files**:
-
-```bash
-python cleaner.py --dry-run
-```
-
-A warning banner will be displayed to indicate Dry Run mode.
-
-#### 3️⃣ Clean a custom folder
-
-```bash
-python cleaner.py "D:\MyFolder"
-```
-
-#### 4️⃣ Custom folder + Dry Run
-
-```bash
-python cleaner.py "D:\MyFolder" --dry-run
-```
+| Command                                     | Description                                  |
+| ------------------------------------------- | -------------------------------------------- |
+| `python cleaner.py`                         | Default run (real move)                      |
+| `python cleaner.py --dry-run`               | Preview changes without moving files         |
+| `python cleaner.py "D:\MyFolder"`           | Clean a custom folder                        |
+| `python cleaner.py "D:\MyFolder" --dry-run` | Dry run on custom folder                     |
+| `python cleaner.py --rollback`              | Undo last real-run using `move_history.json` |
 
 ---
 
 ### 📁 File Categories
 
-Files are organized based on their extensions into folders such as:
+Files are sorted into:
+**Images, Documents, Archives, Installers, Videos, Music, Code, Others**
 
-* Images
-* Documents
-* Archives
-* Installers
-* Videos
-* Music
-* Code
-* Others
+### ⚙️ Custom Categories
+
+Edit `categories.json` to change file groups. If missing/invalid, defaults are used.
 
 ---
 
-### ⚙️ Custom Categories (Optional)
+### 📊 Summary Report
 
-You can customize file categories by editing `categories.json`.
-No code changes are required.
+After running, terminal displays:
 
-If the file is missing or invalid, the tool will use default categories.
+* Total files processed
+* Files moved
+* Files renamed
+* Breakdown by category
+* Mode (Dry Run / Real Run)
 
 ---
 
 ### ⚠️ Notes
 
-* Category folders are created automatically if they do not exist
-* Hidden files and directories are ignored
-* Files are never overwritten — duplicates are auto-renamed
-* The tool scans subfolders recursively but keeps the folder structure intact.
-
+* Category folders auto-created if missing
+* Hidden files and directories ignored
+* Files never overwritten — duplicates renamed automatically
+* Recursively scans subfolders while preserving structure
+* Logs (`file_organizer.log`) and move history (`move_history.json`) created locally
+* Add these files to `.gitignore` to avoid pushing to GitHub
 
 ---
 
 ### 📄 License
 
 MIT License
-
 Author: **Minx-nie**
 
 ---
@@ -131,35 +118,37 @@ Author: **Minx-nie**
 
 ### 📌 Giới thiệu
 
-**File Organizer** là một công cụ Python chạy bằng dòng lệnh (CLI) giúp bạn dọn dẹp thư mục lộn xộn bằng cách tự động phân loại file theo đuôi mở rộng.
+**File Organizer** là công cụ Python CLI giúp tự động phân loại file trong các thư mục lộn xộn.
 
-Tool được thiết kế với tiêu chí **an toàn**, **đơn giản** và **dễ sử dụng** — không cần chỉnh sửa code.
+**Điểm nổi bật:**
+
+* An toàn — Dry Run xem trước thay đổi
+* Hoàn tác lần chạy gần nhất bằng `move_history.json`
+* Báo cáo tổng kết file đã xử lý, di chuyển và đổi tên
+* Cấu hình nhóm file qua `categories.json`
 
 ---
 
 ### ✨ Tính năng
 
-* 📂 Tự động phân loại file
-* 🛡️ Chế độ Dry Run (xem trước kết quả)
-* 🧾 Chạy bằng dòng lệnh (CLI)
-* 📝 Ghi log chi tiết vào `file_organizer.log`
-* ⚡ Tự xử lý file trùng tên
+* 📂 Tự động phân loại file theo đuôi
+* 🛡️ Chạy thử (Dry Run) mà không di chuyển file
+* ↩️ Hoàn tác / Rollback lần chạy gần nhất
+* 🧾 CLI với báo cáo tổng kết chi tiết
+* 📝 Ghi log vào `file_organizer.log`
+* ⚡ Xử lý file trùng tên an toàn
+* ⚙️ Tuỳ chỉnh nhóm file bằng JSON
 
+---
 
 ### 🧰 Yêu cầu
 
-* Python **3.8 trở lên**
-* Không cần cài thêm thư viện
+* Python **3.8+**
+* Không cần thư viện ngoài
 
-
-### 📊 Báo cáo tổng kết
-
-Sau khi tool chạy xong, một báo cáo tổng kết sẽ được in ra terminal. Phần này giúp bạn kiểm tra nhanh kết quả mà không cần mở file log.
-
+---
 
 ### 🚀 Cài đặt
-
-Clone project về máy:
 
 ```bash
 git clone https://github.com/Minx-nie/desktop-cleaner.git
@@ -170,65 +159,51 @@ cd desktop-cleaner
 
 ### ▶️ Cách sử dụng
 
-#### 1️⃣ Chạy thật (mặc định)
-
-Dọn thư mục **Downloads** và di chuyển file thật:
-
-```bash
-python cleaner.py
-```
-
-#### 2️⃣ Chạy thử (khuyến nghị)
-
-Xem trước những gì sẽ xảy ra **mà không di chuyển file**:
-
-```bash
-python cleaner.py --dry-run
-```
-
-Sẽ có banner cảnh báo đang ở chế độ Dry Run.
-
-#### 3️⃣ Dọn thư mục khác
-
-```bash
-python cleaner.py "D:\MyFolder"
-```
-
-#### 4️⃣ Thư mục khác + chạy thử
-
-```bash
-python cleaner.py "D:\MyFolder" --dry-run
-```
+| Lệnh                                        | Mô tả                                     |
+| ------------------------------------------- | ----------------------------------------- |
+| `python cleaner.py`                         | Chạy thật trên Downloads                  |
+| `python cleaner.py --dry-run`               | Xem trước kết quả mà không di chuyển file |
+| `python cleaner.py "D:\MyFolder"`           | Dọn thư mục khác                          |
+| `python cleaner.py "D:\MyFolder" --dry-run` | Chạy thử thư mục khác                     |
+| `python cleaner.py --rollback`              | Hoàn tác lần chạy gần nhất                |
 
 ---
 
 ### 📁 Các nhóm file
 
-File sẽ được đưa vào các thư mục:
-Images, Documents, Archives, Installers, Videos, Music, Code và Others.
+**Images, Documents, Archives, Installers, Videos, Music, Code, Others**
+
+### ⚙️ Tuỳ chỉnh phân loại
+
+Sửa `categories.json` để thay đổi nhóm file. Nếu không hợp lệ, tool dùng mặc định.
 
 ---
 
-### ⚙️ Tuỳ chỉnh phân loại (Không bắt buộc)
+### 📊 Báo cáo tổng kết
 
-Bạn có thể tuỳ chỉnh các nhóm file bằng cách sửa file `categories.json`
-mà không cần chỉnh sửa code.
+Hiển thị:
 
-Nếu file không tồn tại hoặc bị lỗi, tool sẽ dùng cấu hình mặc định.
+* Tổng số file đã xử lý
+* File đã di chuyển
+* File đổi tên
+* Thống kê theo nhóm
+* Chế độ chạy (Dry Run / Real Run)
 
 ---
 
 ### ⚠️ Lưu ý
 
-* Tool tự tạo thư mục phân loại nếu chưa tồn tại
-* Không ghi đè file — file trùng tên sẽ được đổi tên tự động
-* Bỏ qua file ẩn và thư mục con
-* Tool quét toàn bộ thư mục con nhưng không xóa cấu trúc thư mục.
-
+* Tự tạo thư mục nếu chưa có
+* Bỏ qua file/ thư mục ẩn
+* File trùng tên tự đổi tên, không ghi đè
+* Quét toàn bộ thư mục con, giữ cấu trúc
+* Logs và history tạo tại thư mục hiện tại
+* Nên thêm `.gitignore` để không push log/history
 
 ---
 
 ### 📄 Bản quyền
 
-Giấy phép MIT
+MIT License
 Tác giả: **Minx-nie**
+
