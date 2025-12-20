@@ -55,11 +55,33 @@ def parse_arguments():
 
 # ================= CONFIG =================
 
+def validate_categories(categories):
+    valid = {}
+    for cat, exts in categories.items():
+        if not isinstance(cat, str) or not cat.strip():
+            logging.warning(f"Invalid category name: {cat}")
+            continue
+        valid_exts = []
+        if isinstance(exts, list):
+            for ext in exts:
+                if isinstance(ext, str) and ext.startswith("."):
+                    valid_exts.append(ext.lower())
+                else:
+                    logging.warning(f"Invalid extension '{ext}' in category '{cat}'")
+        if valid_exts:
+            valid[cat] = valid_exts
+        else:
+            logging.warning(f"No valid extensions for category '{cat}', skipping")
+    return valid if valid else DEFAULT_CATEGORIES
+
 def load_categories(config_path=CONFIG_FILE):
     if os.path.exists(config_path):
         try:
             with open(config_path, "r", encoding="utf-8") as f:
                 return json.load(f)
+            if not isinstance(data, dict) or not all(isinstance(v, list) for v in data.values()):
+                raise ValueError("Invalid structure, should be a dict of lists.")
+            return data
         except Exception as e:
             print(f"[!] Failed to load {config_path}, using defaults: {e}")
             logging.warning(f"Invalid config file: {e}")
@@ -233,9 +255,9 @@ def clean_folder(folder_to_clean, dry_run, confirm):
     skip_folders = {os.path.join(folder_to_clean, c) for c in categories}
 
     for root, _, files in os.walk(folder_to_clean):
-        if os.path.abspath(root) in skip_folders:
+        if any(os.path.samefile(root, skip) for skip in skip_folders if os.path.exists(skip)):
             continue
-
+        
         for filename in files:
             if filename.startswith("."):
                 logging.info(f"Skipping hidden file: {filename}")
@@ -255,11 +277,12 @@ def clean_folder(folder_to_clean, dry_run, confirm):
             if not os.path.exists(target_folder) and not dry_run:
                 os.makedirs(target_folder)
 
-            new_filename = (
-                get_unique_filename(target_folder, filename)
-                if os.path.exists(os.path.join(target_folder, filename))
-                else filename
-            )
+            if os.path.exists(os.path.join(target_folder, filename)):
+                new_filename = get_unique_filename(target_folder, filename)
+                if dry_run:
+                    print(f"[DRY RUN WARNING] {filename} would be renamed to {new_filename} to avoid conflict.")
+            else:
+                new_filename = filename
 
             if new_filename != filename:
                 summary["renamed"] += 1
