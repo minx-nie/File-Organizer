@@ -1,27 +1,20 @@
-# ================================
-# Python bytecode
-# ================================
+# Python cache / Bytecode
 __pycache__/
 *.py[cod]
-*$py.class
 
-# ================================
-# OS / IDE files
-# ================================
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
+# Logs
+*.log
 
-# ================================
-# Log and history files
-# ================================
-file_organizer.log
+# Move history
 move_history.json
 
-# ================================
-# Optional / temp files
-# ================================
-*.tmp
-*.swp
-*.bak
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Virtual environments (if any)
+venv/
+env/
+
+# IDE / editor files
+.idea/
