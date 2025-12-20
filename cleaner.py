@@ -46,7 +46,7 @@ def parse_arguments():
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Run without actually moving files"
+        help="Run without actually moving files (simulation)"
     )
     return parser.parse_args()
 
@@ -76,6 +76,10 @@ def clean_folder(folder_to_clean, dry_run):
         return
 
     print(f"--- Bắt đầu dọn dẹp: {folder_to_clean} ---")
+    if dry_run:
+        print("="*60)
+        print("  DRY RUN MODE ENABLED - No files will be moved! ")
+        print("="*60)
     print(f"--- Chế độ: {'DRY RUN (Chạy thử)' if dry_run else 'REAL RUN (Chạy thật)'} ---")
 
     files = os.listdir(folder_to_clean)
@@ -109,12 +113,11 @@ def clean_folder(folder_to_clean, dry_run):
 
             if dry_run:
                 print(f"[Thử nghiệm] {filename} -> {category}/{new_filename}")
+                logging.info(f"[DRY RUN] {filename} -> {category}/{new_filename}")
             else:
                 shutil.move(original_path, destination_path)
                 print(f"Đã chuyển: {filename} -> {category}/{new_filename}")
-                logging.info(
-                    f"Moved: {original_path} -> {destination_path}"
-                )
+                logging.info(f"Moved: {original_path} -> {destination_path}")
                 moved_count += 1
 
         except Exception as e:
