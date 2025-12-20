@@ -138,10 +138,13 @@ def load_history():
                 return []
     return []
 
-def save_history_entry(moves):
+def save_history_entry(root_folder, moves):
     history = load_history()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    history.append({"timestamp": timestamp, "moves": moves})
+    history.append({
+        "timestamp": timestamp,
+        "root": root_folder,
+        "moves": moves})
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(history, f, indent=2)
 
@@ -160,7 +163,9 @@ def rollback(timestamp=None):
             return
         moves_to_rollback = entry["moves"]
     else:
-        moves_to_rollback = history[-1]["moves"]
+        entry = history[-1]
+        logging.info(f"Rollback timestamp = {entry['timestamp']} root = {entry.get('root')}")
+        moves_to_rollback = entry["moves"]
 
     restored = 0
     for move in reversed(moves_to_rollback):
@@ -252,7 +257,7 @@ def clean_folder(folder_to_clean, dry_run):
                 except Exception as e:
                     logging.error(f"Failed to move {original_path}: {e}")
     if not dry_run and history:
-        save_history_entry(history)
+        save_history_entry(folder_to_clean,history)
 
     print_summary(summary, dry_run)
 
