@@ -9,8 +9,11 @@ import logging
 import argparse
 import json
 
+# ================= CONSTANTS =================
+
 LOG_FILE = "file_organizer.log"
 CONFIG_FILE = "categories.json"
+HISTORY_FILE = "move_history.json"
 
 DEFAULT_CATEGORIES = {
     "Images": [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"],
@@ -22,6 +25,8 @@ DEFAULT_CATEGORIES = {
     "Code": [".py", ".js", ".html", ".css", ".cpp", ".java", ".json", ".xml"]
 }
 
+# ================= LOGGING =================
+
 logging.basicConfig(
     filename=LOG_FILE,
     level=logging.INFO,
@@ -29,9 +34,11 @@ logging.basicConfig(
     encoding="utf-8"
 )
 
+# ================= ARGUMENTS =================
+
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description="Recursive file organizer with dry-run, config and summary report"
+        description="Recursive file organizer with dry-run, config, summary, and rollback"
     )
     parser.add_argument(
         "path",
@@ -44,7 +51,14 @@ def parse_arguments():
         action="store_true",
         help="Simulate actions without moving files"
     )
+    parser.add_argument(
+        "--rollback",
+        action="store_true",
+        help="Undo the last file organization"
+    )
     return parser.parse_args()
+
+# ================= CONFIG =================
 
 def load_categories(config_path=CONFIG_FILE):
     if os.path.exists(config_path):
@@ -52,8 +66,11 @@ def load_categories(config_path=CONFIG_FILE):
             with open(config_path, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception as e:
+            print(f"⚠️ Failed to load {config_path}, using defaults: {e}")
             logging.warning(f"Invalid config file: {e}")
     return DEFAULT_CATEGORIES
+
+# ================= HELPERS =================
 
 def get_unique_filename(folder, filename):
     name, ext = os.path.splitext(filename)
@@ -83,12 +100,38 @@ def print_summary(summary, dry_run):
         print(f"  - {category}: {count}")
     print("=" * 40)
 
+# ================= ROLLBACK =================
+
+def rollback():
+    if not os.path.exists(HISTORY_FILE):
+        print("⚠️ No history file found. Cannot rollback.")
+        return
+
+    with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+        moves = json.load(f)
+
+    restored = 0
+    for move in reversed(moves):
+        dst = move["dst"]
+        src = move["src"]
+
+        if os.path.exists(dst):
+            os.makedirs(os.path.dirname(src), exist_ok=True)
+            shutil.move(dst, src)
+            restored += 1
+
+    print(f"✔ Rollback complete. {restored} files restored.")
+    os.remove(HISTORY_FILE)
+
+# ================= MAIN LOGIC =================
+
 def clean_folder(folder_to_clean, dry_run):
     if not os.path.isdir(folder_to_clean):
         print(f"❌ Folder not found: {folder_to_clean}")
         return
 
     categories = load_categories()
+    history = []
 
     summary = {
         "total": 0,
@@ -112,7 +155,7 @@ def clean_folder(folder_to_clean, dry_run):
                 continue
 
             original_path = os.path.join(root, filename)
-            if filename in [os.path.basename(__file__), LOG_FILE]:
+            if filename in [os.path.basename(__file__), LOG_FILE, HISTORY_FILE]:
                 continue
 
             _, extension = os.path.splitext(filename)
@@ -143,9 +186,19 @@ def clean_folder(folder_to_clean, dry_run):
             else:
                 shutil.move(original_path, destination_path)
                 summary["moved"] += 1
+                history.append({"src": original_path, "dst": destination_path})
+
+    if not dry_run and history:
+        with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+            json.dump(history, f, indent=2)
 
     print_summary(summary, dry_run)
 
+# ================= ENTRY POINT =================
+
 if __name__ == "__main__":
     args = parse_arguments()
-    clean_folder(args.path, args.dry_run)
+    if args.rollback:
+        rollback()
+    else:
+        clean_folder(args.path, args.dry_run)

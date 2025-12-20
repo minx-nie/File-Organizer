@@ -1,11 +1,27 @@
-# Thư mục cache của Python
+# ================================
+# Python bytecode
+# ================================
 __pycache__/
 *.py[cod]
+*$py.class
 
-# File log
-*.log
-file_organizer.log
-
-# File hệ thống của Windows/Mac
+# ================================
+# OS / IDE files
+# ================================
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/
+
+# ================================
+# Log and history files
+# ================================
+file_organizer.log
+move_history.json
+
+# ================================
+# Optional / temp files
+# ================================
+*.tmp
+*.swp
+*.bak
