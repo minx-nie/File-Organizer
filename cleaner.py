@@ -210,6 +210,7 @@ def clean_folder(folder_to_clean, dry_run):
 
         for filename in files:
             if filename.startswith("."):
+                logging.info(f"Skipping hidden file: {filename}")
                 continue
 
             original_path = os.path.join(root, filename)
@@ -235,16 +236,21 @@ def clean_folder(folder_to_clean, dry_run):
 
             if new_filename != filename:
                 summary["renamed"] += 1
+                logging.warning(f"Renamed {filename} -> {new_filename}")
 
             destination_path = os.path.join(target_folder, new_filename)
 
             if dry_run:
                 print(f"[DRY RUN] {original_path} -> {category}/{new_filename}")
+                logging.info(f"[DRY RUN] {original_path} -> {destination_path}")
             else:
-                shutil.move(original_path, destination_path)
-                summary["moved"] += 1
-                history.append({"src": original_path, "dst": destination_path})
-
+                try:
+                    shutil.move(original_path, destination_path)
+                    summary["moved"] += 1
+                    history.append({"src": original_path, "dst": destination_path})
+                    logging.info(f"Moved {original_path} -> {destination_path}")
+                except Exception as e:
+                    logging.error(f"Failed to move {original_path}: {e}")
     if not dry_run and history:
         save_history_entry(history)
 
