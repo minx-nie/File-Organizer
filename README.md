@@ -25,6 +25,7 @@
 **Key highlights:**
 
 * Safety first — Dry Run mode to preview changes
+* Confirm before executing real moves to prevent accidental file moves
 * Rollback last run using `move_history.json`
 * Summary report with processed, moved, and renamed files
 * Configurable categories via `categories.json`
@@ -35,6 +36,7 @@
 
 * 📂 Automatic file categorization by extension
 * 🛡️ Dry Run mode (preview without moving files)
+* ✅ Confirm before real run (`--confirm`)
 * ↩️ Rollback / Undo last run
 * 🧾 CLI with clear summary report
 * 📝 Logging in `file_organizer.log`
@@ -61,24 +63,43 @@ cd desktop-cleaner
 
 ### ▶️ Usage
 
-| Command                                     | Description                                  |
-| ------------------------------------------- | -------------------------------------------- |
-| `python cleaner.py`                         | Default run (real move)                      |
-| `python cleaner.py --dry-run`               | Preview changes without moving files         |
-| `python cleaner.py "D:\MyFolder"`           | Clean a custom folder                        |
-| `python cleaner.py "D:\MyFolder" --dry-run` | Dry run on custom folder                     |
-| `python cleaner.py --rollback`              | Undo last real-run using `move_history.json` |
+| Command                                        | Description                              |
+| ---------------------------------------------- | ---------------------------------------- |
+| `python cleaner.py --dry-run`                  | Preview changes without moving files     |
+| `python cleaner.py --confirm`                  | Execute real move (Downloads by default) |
+| `python cleaner.py "D:\MyFolder" --dry-run`    | Dry run on custom folder                 |
+| `python cleaner.py "D:\MyFolder" --confirm`    | Real run on custom folder                |
+| `python cleaner.py --rollback`                 | Undo last run                            |
+| `python cleaner.py --rollback 20251221_153045` | Undo specific timestamp run              |
+| `python cleaner.py --list-history`             | List available rollback history          |
 
 ---
 
 ### 📁 File Categories
 
 Files are sorted into:
+
 **Images, Documents, Archives, Installers, Videos, Music, Code, Others**
 
 ### ⚙️ Custom Categories
 
 Edit `categories.json` to change file groups. If missing/invalid, defaults are used.
+
+---
+
+🎨 Visual Examples
+<div align="center">
+
+Messy Folder
+<img src="sample_images/messy_folder.png" alt="Messy folder" width="400"/>
+
+Cleaned Folder
+<img src="sample_images/cleaned_folder.png" alt="Cleaned folder" width="400"/>
+
+Workflow Diagram
+<img src="sample_images/workflow.png" alt="Workflow" width="600"/>
+
+</div>
 
 ---
 
@@ -101,7 +122,50 @@ After running, terminal displays:
 * Files never overwritten — duplicates renamed automatically
 * Recursively scans subfolders while preserving structure
 * Logs (`file_organizer.log`) and move history (`move_history.json`) created locally
-* Add these files to `.gitignore` to avoid pushing to GitHub
+
+
+---
+
+### 📝 Examples
+
+#### Dry Run
+
+```bash
+python cleaner.py --dry-run
+python cleaner.py "D:\MyFolder" --dry-run
+```
+
+#### Real Run (Confirm)
+
+```bash
+python cleaner.py --confirm
+python cleaner.py "D:\MyFolder" --confirm
+```
+
+#### Rollback
+
+```bash
+python cleaner.py --rollback
+python cleaner.py --rollback 20251221_153045
+```
+
+#### List History
+
+```bash
+python cleaner.py --list-history
+```
+
+#### Visual Example
+
+| File Name   | Original Folder | Category Folder | Action |
+| ----------- | --------------- | --------------- | ------ |
+| photo.jpg   | Downloads       | Images          | Move   |
+| report.docx | Downloads       | Documents       | Move   |
+| song.mp3    | Downloads       | Music           | Move   |
+| archive.zip | Downloads       | Archives        | Move   |
+| setup.exe   | Downloads       | Installers      | Move   |
+| script.py   | Downloads       | Code            | Move   |
+| unknown.xyz | Downloads       | Others          | Move   |
 
 ---
 
@@ -123,6 +187,7 @@ Author: **Minx-nie**
 **Điểm nổi bật:**
 
 * An toàn — Dry Run xem trước thay đổi
+* Xác nhận trước khi chạy thật (`--confirm`)
 * Hoàn tác lần chạy gần nhất bằng `move_history.json`
 * Báo cáo tổng kết file đã xử lý, di chuyển và đổi tên
 * Cấu hình nhóm file qua `categories.json`
@@ -133,6 +198,7 @@ Author: **Minx-nie**
 
 * 📂 Tự động phân loại file theo đuôi
 * 🛡️ Chạy thử (Dry Run) mà không di chuyển file
+* ✅ Xác nhận trước khi chạy thật
 * ↩️ Hoàn tác / Rollback lần chạy gần nhất
 * 🧾 CLI với báo cáo tổng kết chi tiết
 * 📝 Ghi log vào `file_organizer.log`
@@ -159,13 +225,15 @@ cd desktop-cleaner
 
 ### ▶️ Cách sử dụng
 
-| Lệnh                                        | Mô tả                                     |
-| ------------------------------------------- | ----------------------------------------- |
-| `python cleaner.py`                         | Chạy thật trên Downloads                  |
-| `python cleaner.py --dry-run`               | Xem trước kết quả mà không di chuyển file |
-| `python cleaner.py "D:\MyFolder"`           | Dọn thư mục khác                          |
-| `python cleaner.py "D:\MyFolder" --dry-run` | Chạy thử thư mục khác                     |
-| `python cleaner.py --rollback`              | Hoàn tác lần chạy gần nhất                |
+| Lệnh                                           | Mô tả                                     |
+| ---------------------------------------------- | ----------------------------------------- |
+| `python cleaner.py --dry-run`                  | Xem trước kết quả mà không di chuyển file |
+| `python cleaner.py --confirm`                  | Chạy thật trên Downloads                  |
+| `python cleaner.py "D:\MyFolder" --dry-run`    | Chạy thử thư mục khác                     |
+| `python cleaner.py "D:\MyFolder" --confirm`    | Chạy thật thư mục khác                    |
+| `python cleaner.py --rollback`                 | Hoàn tác lần chạy gần nhất                |
+| `python cleaner.py --rollback 20251221_153045` | Hoàn tác theo timestamp cụ thể            |
+| `python cleaner.py --list-history`             | Liệt kê lịch sử các lần chạy              |
 
 ---
 
@@ -176,6 +244,22 @@ cd desktop-cleaner
 ### ⚙️ Tuỳ chỉnh phân loại
 
 Sửa `categories.json` để thay đổi nhóm file. Nếu không hợp lệ, tool dùng mặc định.
+
+---
+
+🎨 Ví dụ trực quan
+<div align="center">
+
+Thư mục lộn xộn
+<img src="sample_images/messy_folder.png" alt="Messy folder" width="400"/>
+
+Thư mục đã sắp xếp
+<img src="sample_images/cleaned_folder.png" alt="Cleaned folder" width="400"/>
+
+Sơ đồ Workflow
+<img src="sample_images/workflow.png" alt="Workflow" width="600"/>
+
+</div>
 
 ---
 
@@ -198,7 +282,20 @@ Hiển thị:
 * File trùng tên tự đổi tên, không ghi đè
 * Quét toàn bộ thư mục con, giữ cấu trúc
 * Logs và history tạo tại thư mục hiện tại
-* Nên thêm `.gitignore` để không push log/history
+
+---
+
+### 📝 Ví dụ minh họa
+
+| Tên File    | Thư mục gốc | Thư mục phân loại | Hành động |
+| ----------- | ----------- | ----------------- | --------- |
+| photo.jpg   | Downloads   | Images            | Di chuyển |
+| report.docx | Downloads   | Documents         | Di chuyển |
+| song.mp3    | Downloads   | Music             | Di chuyển |
+| archive.zip | Downloads   | Archives          | Di chuyển |
+| setup.exe   | Downloads   | Installers        | Di chuyển |
+| script.py   | Downloads   | Code              | Di chuyển |
+| unknown.xyz | Downloads   | Others            | Di chuyển |
 
 ---
 

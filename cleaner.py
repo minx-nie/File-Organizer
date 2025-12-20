@@ -42,22 +42,13 @@ def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Recursive file organizer with dry-run, config, summary, and rollback"
     )
-    parser.add_argument(
-        "path",
-        nargs="?",
-        default=os.path.join(os.path.expanduser("~"), "Downloads"),
-        help="Folder to clean (default: ~/Downloads)"
-    )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Simulate actions without moving files"
-    )
-    parser.add_argument(
-        "--rollback",
-        metavar="TIMESTAMP",
-        help="Rollback last run or a specific timestamp"
-    )
+    parser.add_argument("path", nargs="?", default=os.path.join(os.path.expanduser("~"), "Downloads"),
+                        help="Folder to clean (default: ~/Downloads)")
+    parser.add_argument("--dry-run", action="store_true", help="Simulate actions without moving files")
+    parser.add_argument("--rollback", nargs="?", default=None,
+                        help="Undo a previous file organization (optional timestamp)")
+    parser.add_argument("--confirm", action="store_true", help="Confirm before executing the move")
+    parser.add_argument("--list-history", action="store_true", help="List available rollback history")
     return parser.parse_args()
 
 
@@ -69,9 +60,10 @@ def load_categories(config_path=CONFIG_FILE):
             with open(config_path, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception as e:
-            print(f"⚠️ Failed to load {config_path}, using defaults: {e}")
+            print(f"[!] Failed to load {config_path}, using defaults: {e}")
             logging.warning(f"Invalid config file: {e}")
     return DEFAULT_CATEGORIES
+
 
 # ================= HELPERS =================
 
@@ -83,6 +75,7 @@ def get_unique_filename(folder, filename):
         new_name = f"{name} ({counter}){ext}"
         counter += 1
     return new_name
+
 
 def get_category(extension, categories, filepath=None):
     extension = extension.lower()
@@ -114,6 +107,7 @@ def get_category(extension, categories, filepath=None):
                 return "Code"
     return "Others"
 
+
 def print_summary(summary, dry_run):
     print("\n" + "=" * 40)
     print("📊 SUMMARY REPORT")
@@ -127,6 +121,7 @@ def print_summary(summary, dry_run):
         print(f"  - {category}: {count}")
     print("=" * 40)
 
+
 # ================= HISTORY =================
 
 def load_history():
@@ -138,6 +133,7 @@ def load_history():
                 return []
     return []
 
+
 def save_history_entry(root_folder, moves):
     history = load_history()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -148,18 +144,34 @@ def save_history_entry(root_folder, moves):
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(history, f, indent=2)
 
+
+def list_history():
+    history = load_history()
+    if not history:
+        print("[!] No history available.")
+        return
+    
+    print("\n Available rollback history:")
+    print("-" * 40)
+    for entry in history:
+        ts = entry.get("timestamp")
+        count = len(entry.get("moves", []))
+        print(f" - {ts} ({count} files)")
+    print("-" * 40)
+
+
 # ================= ROLLBACK =================
 
 def rollback(timestamp=None):
     history = load_history()
     if not history:
-        print("⚠️ No history available for rollback.")
+        print("[!] No history available for rollback.")
         return
 
     if timestamp:
         entry = next((h for h in history if h["timestamp"] == timestamp), None)
         if not entry:
-            print(f"⚠️ No rollback entry found for timestamp: {timestamp}")
+            print(f"[!] No rollback entry found for timestamp: {timestamp}")
             return
         moves_to_rollback = entry["moves"]
     else:
@@ -186,13 +198,17 @@ def rollback(timestamp=None):
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(history, f, indent=2)
 
+
 # ================= MAIN LOGIC =================
 
-def clean_folder(folder_to_clean, dry_run):
+def clean_folder(folder_to_clean, dry_run, confirm):
     if not os.path.isdir(folder_to_clean):
-        print(f"❌ Folder not found: {folder_to_clean}")
+        print(f"[X] Folder not found: {folder_to_clean}")
         return
-
+    if not dry_run and not confirm:
+        print("[!] Real run detected. Use --confirm to proceed.")
+        return
+    
     categories = load_categories()
     history = []
 
@@ -205,7 +221,7 @@ def clean_folder(folder_to_clean, dry_run):
 
     if dry_run:
         print("=" * 60)
-        print("⚠️  DRY RUN MODE ENABLED - NO FILES WILL BE MOVED")
+        print("[!]  DRY RUN MODE ENABLED - NO FILES WILL BE MOVED")
         print("=" * 60)
 
     for root, _, files in os.walk(folder_to_clean):
@@ -223,7 +239,6 @@ def clean_folder(folder_to_clean, dry_run):
                 continue
 
             _, extension = os.path.splitext(filename)
-
             category = get_category(extension, categories, filepath=original_path)
             summary["total"] += 1
             summary["by_category"].setdefault(category, 0)
@@ -256,16 +271,21 @@ def clean_folder(folder_to_clean, dry_run):
                     logging.info(f"Moved {original_path} -> {destination_path}")
                 except Exception as e:
                     logging.error(f"Failed to move {original_path}: {e}")
+
     if not dry_run and history:
-        save_history_entry(folder_to_clean,history)
+        save_history_entry(folder_to_clean, history)
 
     print_summary(summary, dry_run)
+
 
 # ================= ENTRY POINT =================
 
 if __name__ == "__main__":
     args = parse_arguments()
-    if args.rollback:
-        rollback()
+
+    if args.list_history:
+        list_history()
+    elif args.rollback is not None:
+        rollback(args.rollback)
     else:
-        clean_folder(args.path, args.dry_run)
+        clean_folder(args.path, args.dry_run, args.confirm)
