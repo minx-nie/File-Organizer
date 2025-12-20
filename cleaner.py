@@ -8,6 +8,8 @@ import shutil
 import logging
 import argparse
 import json
+import mimetypes
+from datetime import datetime
 
 # ================= CONSTANTS =================
 
@@ -53,10 +55,11 @@ def parse_arguments():
     )
     parser.add_argument(
         "--rollback",
-        action="store_true",
-        help="Undo the last file organization"
+        metavar="TIMESTAMP",
+        help="Rollback last run or a specific timestamp"
     )
     return parser.parse_args()
+
 
 # ================= CONFIG =================
 
@@ -81,10 +84,34 @@ def get_unique_filename(folder, filename):
         counter += 1
     return new_name
 
-def get_category(extension, categories):
-    for category, extensions in categories.items():
-        if extension in extensions:
+def get_category(extension, categories, filepath=None):
+    extension = extension.lower()
+    for category, exts in categories.items():
+        if extension in exts:
             return category
+
+    if filepath:
+        mime_type, _ = mimetypes.guess_type(filepath)
+        if mime_type:
+            if mime_type.startswith("image/"):
+                return "Images"
+            elif mime_type.startswith("video/"):
+                return "Videos"
+            elif mime_type.startswith("audio/"):
+                return "Music"
+            elif mime_type in ("application/pdf", "application/msword",
+                               "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                               "application/vnd.ms-excel",
+                               "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                               "text/plain"):
+                return "Documents"
+            elif mime_type in ("application/zip", "application/x-rar-compressed",
+                               "application/x-7z-compressed", "application/gzip"):
+                return "Archives"
+            elif mime_type in ("application/x-msdownload", "application/x-ms-installer"):
+                return "Installers"
+            elif mime_type.startswith("text/"):
+                return "Code"
     return "Others"
 
 def print_summary(summary, dry_run):
@@ -100,28 +127,59 @@ def print_summary(summary, dry_run):
         print(f"  - {category}: {count}")
     print("=" * 40)
 
+# ================= HISTORY =================
+
+def load_history():
+    if os.path.exists(HISTORY_FILE):
+        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return []
+    return []
+
+def save_history_entry(moves):
+    history = load_history()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    history.append({"timestamp": timestamp, "moves": moves})
+    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(history, f, indent=2)
+
 # ================= ROLLBACK =================
 
-def rollback():
-    if not os.path.exists(HISTORY_FILE):
-        print("⚠️ No history file found. Cannot rollback.")
+def rollback(timestamp=None):
+    history = load_history()
+    if not history:
+        print("⚠️ No history available for rollback.")
         return
 
-    with open(HISTORY_FILE, "r", encoding="utf-8") as f:
-        moves = json.load(f)
+    if timestamp:
+        entry = next((h for h in history if h["timestamp"] == timestamp), None)
+        if not entry:
+            print(f"⚠️ No rollback entry found for timestamp: {timestamp}")
+            return
+        moves_to_rollback = entry["moves"]
+    else:
+        moves_to_rollback = history[-1]["moves"]
 
     restored = 0
-    for move in reversed(moves):
+    for move in reversed(moves_to_rollback):
         dst = move["dst"]
         src = move["src"]
-
         if os.path.exists(dst):
             os.makedirs(os.path.dirname(src), exist_ok=True)
             shutil.move(dst, src)
             restored += 1
 
     print(f"✔ Rollback complete. {restored} files restored.")
-    os.remove(HISTORY_FILE)
+
+    if timestamp:
+        history = [h for h in history if h["timestamp"] != timestamp]
+    else:
+        history.pop()
+
+    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(history, f, indent=2)
 
 # ================= MAIN LOGIC =================
 
@@ -159,9 +217,8 @@ def clean_folder(folder_to_clean, dry_run):
                 continue
 
             _, extension = os.path.splitext(filename)
-            extension = extension.lower()
 
-            category = get_category(extension, categories)
+            category = get_category(extension, categories, filepath=original_path)
             summary["total"] += 1
             summary["by_category"].setdefault(category, 0)
             summary["by_category"][category] += 1
@@ -172,7 +229,7 @@ def clean_folder(folder_to_clean, dry_run):
 
             new_filename = (
                 get_unique_filename(target_folder, filename)
-                if os.path.exists(target_folder)
+                if os.path.exists(os.path.join(target_folder, filename))
                 else filename
             )
 
@@ -189,8 +246,7 @@ def clean_folder(folder_to_clean, dry_run):
                 history.append({"src": original_path, "dst": destination_path})
 
     if not dry_run and history:
-        with open(HISTORY_FILE, "w", encoding="utf-8") as f:
-            json.dump(history, f, indent=2)
+        save_history_entry(history)
 
     print_summary(summary, dry_run)
 
