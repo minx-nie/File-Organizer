@@ -11,54 +11,70 @@
 ## 🇬🇧 English
 
 ### About The Project
-Tired of a messy Downloads folder? **File Organizer** scans your target directory and intelligently moves files into categorized folders (Images, Documents, Music, etc.).
+**File Organizer** is a simple CLI tool that helps you clean up cluttered folders by automatically organizing files into categorized directories.
 
-Unlike basic cleaners, this tool features a **Dry Run** mode (simulation) to ensure safety before moving any files.
+⚠️ **Important:**  
+This tool now uses **command-line arguments** instead of hard-coded configuration inside the script.
 
 #### ✨ Key Features
-- 📂 **Smart Categorization:** Sorts files into Images, Documents, Archives, Installers, Videos, Music, and Code
-- 🛡️ **Dry Run Mode:** Previews changes without moving files
-- 📝 **Detailed Logging:** Keeps history in `file_organizer.log`
-- ⚡ **Conflict Handling:** Auto-renames duplicates (e.g., `file (1).txt`)
-- 💻 **Cross-platform & CLI:** Specify folder to clean and dry-run option via command line
+- 📂 **Smart Categorization** by file extension
+- 🛡️ **Dry Run Mode (default-safe):** Preview actions before moving files
+- 🧾 **Command Line Interface (CLI):** No need to edit the source code
+- 📝 **Detailed Logging:** All actions are recorded in `file_organizer.log`
+- ⚡ **Duplicate Handling:** Automatically renames files to avoid overwrite
 
-#### 🚀 Getting Started
-**Clone the repository:**
-```bash
-git clone https://github.com/Minx-nie/desktop-cleaner.git
-````
+---
 
-**Run the tool:**
+### 🚀 Usage
 
-* **Default run (Downloads folder, moves files for real):**
-
+#### Default run (real move)
 ```bash
 python cleaner.py
-```
+````
 
-* **Specify a custom folder:**
+✔ Cleans your **Downloads** folder and moves files for real.
 
-```bash
-python cleaner.py "D:\MyFolder"
-```
+---
 
-* **Dry Run (preview changes without moving files):**
+#### Dry Run (recommended first)
 
 ```bash
 python cleaner.py --dry-run
 ```
 
-* **Custom folder + Dry Run:**
+✔ Shows what would happen
+❌ Does NOT move any files
+⚠️ A warning banner will be displayed
+
+---
+
+#### Custom folder
+
+```bash
+python cleaner.py "D:\MyFolder"
+```
+
+---
+
+#### Custom folder + Dry Run
 
 ```bash
 python cleaner.py "D:\MyFolder" --dry-run
 ```
 
-> The tool will automatically create category folders if they do not exist.
+---
+
+### 📌 Notes
+
+* Category folders will be created automatically.
+* Files with duplicate names will be auto-renamed.
+* Hidden files and folders are ignored.
+
+---
 
 #### 📄 License & Author
 
-Distributed under the MIT License. See LICENSE for more information.
+MIT License
 Author: Minx-nie
 
 ---
@@ -69,57 +85,72 @@ Author: Minx-nie
 
 ### Giới thiệu
 
-Thư mục Downloads của bạn quá bừa bộn? **File Organizer** sẽ giải quyết vấn đề này chỉ bằng một cú click. Tool sẽ tự động quét và di chuyển file vào các thư mục gọn gàng (Ảnh, Tài liệu, Nhạc, v.v.).
+**File Organizer** là một tool dòng lệnh (CLI) giúp bạn dọn dẹp thư mục lộn xộn bằng cách tự động phân loại file theo đuôi mở rộng.
 
-Điểm đặc biệt là **chế độ Dry Run** (Chạy thử) giúp bạn xem trước kết quả, đảm bảo an toàn trước khi di chuyển file thật.
+⚠️ **Lưu ý quan trọng:**
+Tool **không còn chỉnh sửa cấu hình trong code**. Mọi thao tác đều thực hiện qua **command line**.
 
 #### ✨ Tính năng chính
 
-* 📂 **Phân loại thông minh:** Tự động đưa file vào nhóm Images, Documents, Archives, Installers, Videos, Music và Code
-* 🛡️ **Chế độ Dry Run:** Xem trước những gì sẽ xảy ra mà không di chuyển file
-* 📝 **Ghi Log chi tiết:** Lưu lịch sử di chuyển file vào `file_organizer.log`
-* ⚡ **Xử lý trùng tên:** Tự động đổi tên nếu file đã tồn tại (ví dụ: `tailieu (1).pdf`)
-* 💻 **Chạy đa nền tảng & CLI:** Chọn thư mục muốn dọn và chế độ dry-run qua command line
+* 📂 **Phân loại thông minh** theo loại file
+* 🛡️ **Dry Run (khuyến nghị chạy trước):** Xem trước kết quả mà không di chuyển file
+* 🧾 **CLI thân thiện:** Không cần mở file `.py` để chỉnh sửa
+* 📝 **Ghi log chi tiết:** Lưu toàn bộ lịch sử vào `file_organizer.log`
+* ⚡ **Tự xử lý trùng tên file**
 
-#### 🚀 Hướng dẫn sử dụng
+---
 
-**Tải về máy:**
+### 🚀 Cách sử dụng
 
-```bash
-git clone https://github.com/Minx-nie/desktop-cleaner.git
-```
-
-**Chạy tool:**
-
-* **Mặc định (thư mục Downloads, di chuyển file thật):**
+#### Chạy thật (mặc định)
 
 ```bash
 python cleaner.py
 ```
 
-* **Chọn thư mục khác:**
+✔ Dọn thư mục **Downloads**
+⚠️ File sẽ được di chuyển thật
 
-```bash
-python cleaner.py "D:\MyFolder"
-```
+---
 
-* **Chạy thử (không di chuyển file):**
+#### Chạy thử (an toàn)
 
 ```bash
 python cleaner.py --dry-run
 ```
 
-* **Chọn thư mục + chạy thử:**
+✔ Chỉ hiển thị kết quả
+❌ Không di chuyển file
+⚠️ Có banner cảnh báo DRY RUN
+
+---
+
+#### Chọn thư mục khác
+
+```bash
+python cleaner.py "D:\MyFolder"
+```
+
+---
+
+#### Chọn thư mục + chạy thử
 
 ```bash
 python cleaner.py "D:\MyFolder" --dry-run
 ```
 
-> Tool sẽ tự động tạo các thư mục theo category nếu chưa có.
+---
+
+### 📌 Ghi chú
+
+* Tool sẽ tự tạo thư mục phân loại nếu chưa tồn tại
+* File trùng tên sẽ được tự động đổi tên
+* Bỏ qua file ẩn và thư mục con
+
+---
 
 #### 📄 Bản quyền & Tác giả
 
-Phân phối theo giấy phép MIT. Xem file LICENSE để biết thêm chi tiết.
+MIT License
 Tác giả: Minx-nie
 
-```
