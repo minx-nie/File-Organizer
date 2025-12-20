@@ -25,6 +25,21 @@ This tool now uses **command-line arguments** instead of hard-coded configuratio
 
 ---
 
+### 🛠️ Installation
+
+1. **Prerequisite:** Ensure you have Python installed (v3.6 or later).
+2. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/Minx-nie/File-Organizer.git](https://github.com/Minx-nie/File-Organizer.git)
+
+```
+
+3. **Navigate to the folder:**
+```bash
+cd File-Organizer
+
+```
+
 ### 🚀 Usage
 
 #### Default run (real move)
@@ -100,6 +115,23 @@ Tool **không còn chỉnh sửa cấu hình trong code**. Mọi thao tác đề
 
 ---
 
+
+
+### 🛠️ Cài đặt
+
+1. **Yêu cầu:** Máy tính đã cài sẵn Python (bản 3.6 trở lên).
+2. **Tải code về máy:**
+   ```bash
+   git clone [https://github.com/Minx-nie/File-Organizer.git](https://github.com/Minx-nie/File-Organizer.git)
+
+```
+
+3. **Truy cập vào thư mục:**
+```bash
+cd File-Organizer
+
+```
+
 ### 🚀 Cách sử dụng
 
 #### Chạy thật (mặc định)
@@ -153,4 +185,5 @@ python cleaner.py "D:\MyFolder" --dry-run
 
 MIT License
 Tác giả: Minx-nie
+
 
