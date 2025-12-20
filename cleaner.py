@@ -68,13 +68,15 @@ def load_categories(config_path=CONFIG_FILE):
 
 # ================= HELPERS =================
 
-def get_unique_filename(folder, filename):
+def get_unique_filename(folder, filename,max_attempts=1000):
     name, ext = os.path.splitext(filename)
     counter = 1
     new_name = filename
-    while os.path.exists(os.path.join(folder, new_name)):
+    while os.path.exists(os.path.join(folder, new_name)) and counter <= max_attempts:
         new_name = f"{name} ({counter}){ext}"
         counter += 1
+    if counter > max_attempts:
+        raise Exception(f"[!] Cannot create unique filename for {filename} in {folder}")
     return new_name
 
 
@@ -226,7 +228,7 @@ def clean_folder(folder_to_clean, dry_run, confirm):
         print("=" * 60)
         print("[!]  DRY RUN MODE ENABLED - NO FILES WILL BE MOVED")
         print("=" * 60)
-    
+
     current_script = os.path.basename(sys.argv[0])
     skip_folders = {os.path.join(folder_to_clean, c) for c in categories}
 
@@ -240,7 +242,7 @@ def clean_folder(folder_to_clean, dry_run, confirm):
                 continue
 
             original_path = os.path.join(root, filename)
-            if filename in [os.path.basename(__file__), LOG_FILE, HISTORY_FILE]:
+            if filename in [current_script, LOG_FILE, HISTORY_FILE]:
                 continue
 
             _, extension = os.path.splitext(filename)
