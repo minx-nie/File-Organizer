@@ -1,0 +1,11 @@
+# Thư mục cache của Python
+__pycache__/
+*.py[cod]
+
+# File log
+*.log
+file_organizer.log
+
+# File hệ thống của Windows/Mac
+.DS_Store
+Thumbs.db
