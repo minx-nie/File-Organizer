@@ -18,6 +18,8 @@ LOG_FILE = "file_organizer.log"
 CONFIG_FILE = "categories.json"
 HISTORY_FILE = "move_history.json"
 
+IGNORED_DIRS = {'.git', '.idea', '.vscode', '__pycache__', 'node_modules', 'venv', 'env', '.svn'}
+
 DEFAULT_CATEGORIES = {
     "Images": [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"],
     "Documents": [".pdf", ".docx", ".doc", ".txt", ".xlsx", ".pptx", ".csv"],
@@ -46,8 +48,8 @@ def parse_arguments():
     parser.add_argument("path", nargs="?", default=os.path.join(os.path.expanduser("~"), "Downloads"),
                         help="Folder to clean (default: ~/Downloads)")
     parser.add_argument("--dry-run", action="store_true", help="Simulate actions without moving files")
-    parser.add_argument("--rollback", nargs="?", default=None,
-                        help="Undo a previous file organization (optional timestamp)")
+    parser.add_argument("--rollback", nargs="?", const="LATEST", default=None,
+                        help="Undo a previous file organization (default: latest). Provide timestamp to rollback specific entry.")
     parser.add_argument("--confirm", action="store_true", help="Confirm before executing the move")
     parser.add_argument("--list-history", action="store_true", help="List available rollback history")
     return parser.parse_args()
@@ -78,10 +80,10 @@ def load_categories(config_path=CONFIG_FILE):
     if os.path.exists(config_path):
         try:
             with open(config_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
             if not isinstance(data, dict) or not all(isinstance(v, list) for v in data.values()):
                 raise ValueError("Invalid structure, should be a dict of lists.")
-            return data
+            return validate_categories(data)
         except Exception as e:
             print(f"[!] Failed to load {config_path}, using defaults: {e}")
             logging.warning(f"Invalid config file: {e}")
@@ -132,6 +134,24 @@ def get_category(extension, categories, filepath=None):
                 return "Code"
     return "Others"
 
+def remove_empty_folders(path, dry_run=False):
+    if not os.path.isdir(path):
+        return
+    for root, dirs, files in os.walk(path, topdown=False):
+        if root == path: continue
+        if any(ignored in root for ignored in IGNORED_DIRS):
+            continue
+
+        try:
+            if not os.listdir(root):
+                if dry_run:
+                    print(f"[DRY RUN] Would remove empty folder: {root}")
+                    logging.info(f"[DRY RUN] Would remove empty folder: {root}")
+                else:
+                    os.rmdir(root)
+                    logging.info(f"Removed empty folder: {root}")
+        except Exception as e:
+            logging.warning(f"Cannot remove folder {root}: {e}")
 
 def print_summary(summary, dry_run):
     print("\n" + "=" * 40)
@@ -193,7 +213,7 @@ def rollback(timestamp=None):
         print("[!] No history available for rollback.")
         return
 
-    if timestamp:
+    if timestamp and timestamp != "LATEST":
         entry = next((h for h in history if h["timestamp"] == timestamp), None)
         if not entry:
             print(f"[!] No rollback entry found for timestamp: {timestamp}")
@@ -201,7 +221,8 @@ def rollback(timestamp=None):
         moves_to_rollback = entry["moves"]
     else:
         entry = history[-1]
-        logging.info(f"Rollback timestamp = {entry['timestamp']} root = {entry.get('root')}")
+        timestamp = entry["timestamp"]
+        print(f"[*] Rolling back latest session: {timestamp}")
         moves_to_rollback = entry["moves"]
 
     restored = 0
@@ -212,8 +233,11 @@ def rollback(timestamp=None):
             os.makedirs(os.path.dirname(src), exist_ok=True)
             if os.path.exists(src):
                 src = get_unique_filename(os.path.dirname(src), os.path.basename(src))
-            shutil.move(dst, src)
-            restored += 1
+            try:    
+                shutil.move(dst, src)
+                restored += 1
+            except Exception as e:
+                print(f"[X] Failed to restore {dst}: {e}")
 
     print(f"✔ Rollback complete. {restored} files restored.")
 
@@ -252,19 +276,18 @@ def clean_folder(folder_to_clean, dry_run, confirm):
         print("=" * 60)
 
     current_script = os.path.basename(sys.argv[0])
-    skip_folders = {os.path.join(folder_to_clean, c) for c in categories}
+    target_category_folders = {os.path.join(folder_to_clean, c) for c in categories}
 
-    for root, _, files in os.walk(folder_to_clean):
-        if any(os.path.samefile(root, skip) for skip in skip_folders if os.path.exists(skip)):
+    for root, dirs, files in os.walk(folder_to_clean):
+        dirs[:] = [d for d in dirs if d not in IGNORED_DIRS]
+        if any(os.path.samefile(root, skip) for skip in target_category_folders if os.path.exists(skip)):
             continue
         
         for filename in files:
-            if filename.startswith("."):
-                logging.info(f"Skipping hidden file: {filename}")
-                continue
+            if filename.startswith("."):  continue
 
             original_path = os.path.join(root, filename)
-            if filename in [current_script, LOG_FILE, HISTORY_FILE]:
+            if filename in [current_script, LOG_FILE, HISTORY_FILE, CONFIG_FILE]:
                 continue
 
             _, extension = os.path.splitext(filename)
@@ -274,24 +297,28 @@ def clean_folder(folder_to_clean, dry_run, confirm):
             summary["by_category"][category] += 1
 
             target_folder = os.path.join(folder_to_clean, category)
+            if os.path.dirname(original_path) == target_folder:
+                continue
+
             if not os.path.exists(target_folder) and not dry_run:
                 os.makedirs(target_folder)
 
             if os.path.exists(os.path.join(target_folder, filename)):
                 new_filename = get_unique_filename(target_folder, filename)
                 if dry_run:
-                    print(f"[DRY RUN WARNING] {filename} would be renamed to {new_filename} to avoid conflict.")
+                    msg = f"[DRY RUN] Rename conflict: {filename} -> {new_filename}"
+                    print(msg)
+                    logging.warning(msg)
             else:
                 new_filename = filename
 
-            if new_filename != filename:
+            if new_filename != filename and not dry_run:
                 summary["renamed"] += 1
                 logging.warning(f"Renamed {filename} -> {new_filename}")
 
             destination_path = os.path.join(target_folder, new_filename)
 
             if dry_run:
-                print(f"[DRY RUN] {original_path} -> {category}/{new_filename}")
                 logging.info(f"[DRY RUN] {original_path} -> {destination_path}")
             else:
                 try:
@@ -302,9 +329,12 @@ def clean_folder(folder_to_clean, dry_run, confirm):
                 except Exception as e:
                     logging.error(f"Failed to move {original_path}: {e}")
 
-    if not dry_run and history:
-        save_history_entry(folder_to_clean, history)
-
+    if not dry_run:
+        if history:
+            save_history_entry(folder_to_clean, history)
+        print("Cleaning up empty folders...")
+        remove_empty_folders(folder_to_clean)
+        
     print_summary(summary, dry_run)
 
 
