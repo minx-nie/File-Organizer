@@ -279,7 +279,7 @@ def clean_folder(folder_to_clean, dry_run, confirm):
     history = []
 
     summary = {
-        "total": 0,
+        "total_scanned": 0,
         "moved": 0,
         "renamed": 0,
         "by_category": {}
