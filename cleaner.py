@@ -18,7 +18,7 @@ LOG_FILE = "file_organizer.log"
 CONFIG_FILE = "categories.json"
 HISTORY_FILE = "move_history.json"
 
-IGNORED_DIRS = {'.git', '.idea', '.vscode', '__pycache__', 'node_modules', 'venv', 'env', '.svn'}
+IGNORED_DIRS = {'.git', '.idea', '.vscode', '__pycache__', 'node_modules', 'venv', 'env', '.svn', 'AppData'}
 
 DEFAULT_CATEGORIES = {
     "Images": [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"],
@@ -139,7 +139,7 @@ def remove_empty_folders(path, dry_run=False):
         return
     for root, dirs, files in os.walk(path, topdown=False):
         if root == path: continue
-        if any(ignored in root for ignored in IGNORED_DIRS):
+        if os.path.basename(root) in IGNORED_DIRS:
             continue
 
         try:
@@ -232,7 +232,11 @@ def rollback(timestamp=None):
         if os.path.exists(dst):
             os.makedirs(os.path.dirname(src), exist_ok=True)
             if os.path.exists(src):
-                src = get_unique_filename(os.path.dirname(src), os.path.basename(src))
+                new_src = get_unique_filename(os.path.dirname(src), os.path.basename(src))
+                msg = f"[!] Rollback rename: {os.path.basename(src)} -> {os.path.basename(new_src)}"
+                print(msg)
+                logging.warning(msg)
+                src = new_src
             try:    
                 shutil.move(dst, src)
                 restored += 1
@@ -253,6 +257,17 @@ def rollback(timestamp=None):
 # ================= MAIN LOGIC =================
 
 def clean_folder(folder_to_clean, dry_run, confirm):
+    abs_path = os.path.abspath(folder_to_clean)
+    root_paths = {os.path.abspath(os.sep)}
+    if os.name == 'nt':
+        root_paths.add(os.path.abspath("C:\\"))
+        root_paths.add(os.path.abspath("C:/"))
+
+    if abs_path in root_paths:
+        print(f"[X] REFUSING to run on system root directory: {abs_path}")
+        print(" Please choose a specific folder (e.g., Downloads)")
+        return
+    
     if not os.path.isdir(folder_to_clean):
         print(f"[X] Folder not found: {folder_to_clean}")
         return
@@ -290,16 +305,20 @@ def clean_folder(folder_to_clean, dry_run, confirm):
             if filename in [current_script, LOG_FILE, HISTORY_FILE, CONFIG_FILE]:
                 continue
 
+            summary["total_scanned"] += 1
+
             _, extension = os.path.splitext(filename)
             category = get_category(extension, categories, filepath=original_path)
-            summary["total"] += 1
+            target_folder = os.path.join(folder_to_clean, category)
+            
+            if os.path.dirname(original_path) == target_folder:
+                continue
+
             summary["by_category"].setdefault(category, 0)
             summary["by_category"][category] += 1
 
             target_folder = os.path.join(folder_to_clean, category)
-            if os.path.dirname(original_path) == target_folder:
-                continue
-
+           
             if not os.path.exists(target_folder) and not dry_run:
                 os.makedirs(target_folder)
 
@@ -334,7 +353,7 @@ def clean_folder(folder_to_clean, dry_run, confirm):
             save_history_entry(folder_to_clean, history)
         print("Cleaning up empty folders...")
         remove_empty_folders(folder_to_clean)
-        
+
     print_summary(summary, dry_run)
 
 
