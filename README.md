@@ -4,6 +4,7 @@
   <img src="https://img.shields.io/badge/Python-3.8+-blue?logo=python" alt="Python 3.8+">
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License MIT">
   <img src="https://img.shields.io/badge/Status-Stable-brightgreen" alt="Status Stable">
+  <img src="https://img.shields.io/badge/Type-CLI%20Tool-orange" alt="CLI Tool">
 </div>
 
 ---
@@ -32,16 +33,26 @@
 
 ---
 
+### ⚠️ Safety Notice
+
+> * Always run with `--dry-run` before using `--confirm`
+> * Rollback is **best-effort** and may rename files if name conflicts occur
+> * **Do NOT run this tool on system root directories** (e.g. `/`, `C:\`)
+> * Back up important data before organizing large folders
+
+---
+
 ### ✨ Features
 
-* 📂 Automatic file categorization by extension
+* 📂 Automatic file categorization by extension & MIME
 * 🛡️ Dry Run mode (preview without moving files)
 * ✅ Confirm before real run (`--confirm`)
-* ↩️ Rollback / Undo last run
+* ↩️ Rollback / Undo last run or specific timestamp
 * 🧾 CLI with clear summary report
 * 📝 Logging in `file_organizer.log`
 * ⚡ Safe handling of duplicate filenames
 * ⚙️ Configurable file categories via JSON
+* 🧹 Optional cleanup of empty folders
 
 ---
 
@@ -81,23 +92,48 @@ Files are sorted into:
 
 **Images, Documents, Archives, Installers, Videos, Music, Code, Others**
 
+---
+
 ### ⚙️ Custom Categories
 
-Edit `categories.json` to change file groups. If missing/invalid, defaults are used.
+Edit `categories.json` to change file groups.
+If the file is missing or invalid, default categories are used automatically.
+
+---
+
+### 🚫 Ignored Directories
+
+To avoid breaking projects, the following directories are automatically skipped:
+
+`.git`, `.idea`, `.vscode`, `node_modules`, `venv`, `env`, `__pycache__`, `.svn`
+
+---
+
+### ↩️ Rollback Behavior
+
+Rollback restores files based on recorded move history.
+
+If the original file path already exists, the restored file will be **renamed automatically** to avoid overwriting existing files.
+
+---
+
+### ❌ Limitations
+
+* Does not analyze file contents (extension & MIME-based only)
+* Does not merge folders or flatten directory structure
+* Does not delete files (except empty folders after organizing)
 
 ---
 
 🎨 Visual Examples
+
 <div align="center">
 
-Messy Folder
-<img src="sample_images/messy_folder.png" alt="Messy folder" width="400"/>
+Messy Folder <img src="sample_images/messy_folder.png" alt="Messy folder" width="400"/>
 
-Cleaned Folder
-<img src="sample_images/cleaned_folder.png" alt="Cleaned folder" width="400"/>
+Cleaned Folder <img src="sample_images/cleaned_folder.png" alt="Cleaned folder" width="400"/>
 
-Workflow Diagram
-<img src="sample_images/workflow.png" alt="Workflow" width="600"/>
+Workflow Diagram <img src="sample_images/workflow.png" alt="Workflow" width="600"/>
 
 </div>
 
@@ -105,67 +141,13 @@ Workflow Diagram
 
 ### 📊 Summary Report
 
-After running, terminal displays:
+After running, the terminal displays:
 
 * Total files processed
 * Files moved
 * Files renamed
 * Breakdown by category
-* Mode (Dry Run / Real Run)
-
----
-
-### ⚠️ Notes
-
-* Category folders auto-created if missing
-* Hidden files and directories ignored
-* Files never overwritten — duplicates renamed automatically
-* Recursively scans subfolders while preserving structure
-* Logs (`file_organizer.log`) and move history (`move_history.json`) created locally
-
-
----
-
-### 📝 Examples
-
-#### Dry Run
-
-```bash
-python cleaner.py --dry-run
-python cleaner.py "D:\MyFolder" --dry-run
-```
-
-#### Real Run (Confirm)
-
-```bash
-python cleaner.py --confirm
-python cleaner.py "D:\MyFolder" --confirm
-```
-
-#### Rollback
-
-```bash
-python cleaner.py --rollback
-python cleaner.py --rollback 20251221_153045
-```
-
-#### List History
-
-```bash
-python cleaner.py --list-history
-```
-
-#### Visual Example
-
-| File Name   | Original Folder | Category Folder | Action |
-| ----------- | --------------- | --------------- | ------ |
-| photo.jpg   | Downloads       | Images          | Move   |
-| report.docx | Downloads       | Documents       | Move   |
-| song.mp3    | Downloads       | Music           | Move   |
-| archive.zip | Downloads       | Archives        | Move   |
-| setup.exe   | Downloads       | Installers      | Move   |
-| script.py   | Downloads       | Code            | Move   |
-| unknown.xyz | Downloads       | Others          | Move   |
+* Execution mode (Dry Run / Real Run)
 
 ---
 
@@ -188,114 +170,56 @@ Author: **Minx-nie**
 
 * An toàn — Dry Run xem trước thay đổi
 * Xác nhận trước khi chạy thật (`--confirm`)
-* Hoàn tác lần chạy gần nhất bằng `move_history.json`
-* Báo cáo tổng kết file đã xử lý, di chuyển và đổi tên
-* Cấu hình nhóm file qua `categories.json`
+* Hoàn tác lần chạy gần nhất hoặc theo timestamp
+* Báo cáo tổng kết chi tiết
+* Tuỳ chỉnh nhóm file qua `categories.json`
+
+---
+
+### ⚠️ Cảnh báo an toàn
+
+> * Luôn chạy `--dry-run` trước khi dùng `--confirm`
+> * Rollback **không đảm bảo tuyệt đối** nếu file đã bị thay đổi sau khi chạy
+> * **Không chạy tool ở thư mục gốc hệ thống** (`/`, `C:\`)
+> * Nên sao lưu dữ liệu quan trọng trước khi dọn dẹp
 
 ---
 
 ### ✨ Tính năng
 
-* 📂 Tự động phân loại file theo đuôi
-* 🛡️ Chạy thử (Dry Run) mà không di chuyển file
+* 📂 Tự động phân loại file theo đuôi & MIME
+* 🛡️ Chạy thử (Dry Run)
 * ✅ Xác nhận trước khi chạy thật
-* ↩️ Hoàn tác / Rollback lần chạy gần nhất
-* 🧾 CLI với báo cáo tổng kết chi tiết
-* 📝 Ghi log vào `file_organizer.log`
-* ⚡ Xử lý file trùng tên an toàn
+* ↩️ Hoàn tác / Rollback an toàn
+* 🧾 Báo cáo tổng kết rõ ràng
+* 📝 Ghi log chi tiết
+* ⚡ Xử lý file trùng tên
 * ⚙️ Tuỳ chỉnh nhóm file bằng JSON
+* 🧹 Dọn thư mục trống sau khi sắp xếp
 
 ---
 
-### 🧰 Yêu cầu
+### 🚫 Thư mục bị bỏ qua
 
-* Python **3.8+**
-* Không cần thư viện ngoài
+Tool tự động bỏ qua các thư mục sau để tránh làm hỏng project:
 
----
-
-### 🚀 Cài đặt
-
-```bash
-git clone https://github.com/Minx-nie/desktop-cleaner.git
-cd desktop-cleaner
-```
+`.git`, `.idea`, `.vscode`, `node_modules`, `venv`, `env`, `__pycache__`, `.svn`
 
 ---
 
-### ▶️ Cách sử dụng
+### ↩️ Cơ chế Rollback
 
-| Lệnh                                           | Mô tả                                     |
-| ---------------------------------------------- | ----------------------------------------- |
-| `python cleaner.py --dry-run`                  | Xem trước kết quả mà không di chuyển file |
-| `python cleaner.py --confirm`                  | Chạy thật trên Downloads                  |
-| `python cleaner.py "D:\MyFolder" --dry-run`    | Chạy thử thư mục khác                     |
-| `python cleaner.py "D:\MyFolder" --confirm`    | Chạy thật thư mục khác                    |
-| `python cleaner.py --rollback`                 | Hoàn tác lần chạy gần nhất                |
-| `python cleaner.py --rollback 20251221_153045` | Hoàn tác theo timestamp cụ thể            |
-| `python cleaner.py --list-history`             | Liệt kê lịch sử các lần chạy              |
+Rollback hoàn tác dựa trên lịch sử đã ghi.
+
+Nếu file gốc đã tồn tại, file được hoàn tác sẽ được **đổi tên tự động** để tránh ghi đè.
 
 ---
 
-### 📁 Các nhóm file
+### ❌ Giới hạn
 
-**Images, Documents, Archives, Installers, Videos, Music, Code, Others**
-
-### ⚙️ Tuỳ chỉnh phân loại
-
-Sửa `categories.json` để thay đổi nhóm file. Nếu không hợp lệ, tool dùng mặc định.
-
----
-
-🎨 Ví dụ trực quan
-<div align="center">
-
-Thư mục lộn xộn
-<img src="sample_images/messy_folder.png" alt="Messy folder" width="400"/>
-
-Thư mục đã sắp xếp
-<img src="sample_images/cleaned_folder.png" alt="Cleaned folder" width="400"/>
-
-Sơ đồ Workflow
-<img src="sample_images/workflow.png" alt="Workflow" width="600"/>
-
-</div>
-
----
-
-### 📊 Báo cáo tổng kết
-
-Hiển thị:
-
-* Tổng số file đã xử lý
-* File đã di chuyển
-* File đổi tên
-* Thống kê theo nhóm
-* Chế độ chạy (Dry Run / Real Run)
-
----
-
-### ⚠️ Lưu ý
-
-* Tự tạo thư mục nếu chưa có
-* Bỏ qua file/ thư mục ẩn
-* File trùng tên tự đổi tên, không ghi đè
-* Quét toàn bộ thư mục con, giữ cấu trúc
-* Logs và history tạo tại thư mục hiện tại
-
----
-
-### 📝 Ví dụ minh họa
-
-| Tên File    | Thư mục gốc | Thư mục phân loại | Hành động |
-| ----------- | ----------- | ----------------- | --------- |
-| photo.jpg   | Downloads   | Images            | Di chuyển |
-| report.docx | Downloads   | Documents         | Di chuyển |
-| song.mp3    | Downloads   | Music             | Di chuyển |
-| archive.zip | Downloads   | Archives          | Di chuyển |
-| setup.exe   | Downloads   | Installers        | Di chuyển |
-| script.py   | Downloads   | Code              | Di chuyển |
-| unknown.xyz | Downloads   | Others            | Di chuyển |
+* Không phân tích nội dung file
+* Không gộp hoặc làm phẳng thư mục
+* Không xoá file (chỉ xoá thư mục trống)
 
 ---
 
