@@ -20,6 +20,8 @@ from typing import Dict, Iterable, List, Optional
 LOG_FILE = "file_organizer.log"
 CONFIG_FILE = "categories.json"
 HISTORY_FILE = "move_history.json"
+AUTHOR_NAME = "Thanh Nguyen"
+AUTHOR_EMAIL = "thanhnguyentuan2007@gmail.com"
 
 IGNORED_DIRS = {'.git', '.idea', '.vscode', '__pycache__', 'node_modules', 'venv', 'env', '.svn', 'AppData'}
 
