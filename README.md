@@ -18,7 +18,7 @@
 
 ## 🇬🇧 English
 
-**Maintainer:** Thanh Nguyen — thanhnguyentuan2007@gmail.com
+**Maintainer:** Thanh Nguyen
 
 ### Overview
 
