@@ -1,4 +1,4 @@
-# 📂 File Organizer 
+# 📂 File Organizer
 
 <div align="center">
   <img src="https://img.shields.io/badge/Python-3.8+-blue?logo=python" alt="Python 3.8+">
