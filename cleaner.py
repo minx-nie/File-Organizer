@@ -20,6 +20,8 @@ from typing import Dict, Iterable, List, Optional
 LOG_FILE = "file_organizer.log"
 CONFIG_FILE = "categories.json"
 HISTORY_FILE = "move_history.json"
+AUTHOR_NAME = "Thanh Nguyen"
+AUTHOR_EMAIL = "thanhnguyentuan2007@gmail.com"
 
 IGNORED_DIRS = {'.git', '.idea', '.vscode', '__pycache__', 'node_modules', 'venv', 'env', '.svn', 'AppData'}
 
@@ -549,6 +551,7 @@ def clean_folder(settings: OrganizerSettings) -> None:
         "Source": str(abs_path),
         "Destination": str(destination_root),
         "Mode": settings.mode,
+        "Author": f"{AUTHOR_NAME} <{AUTHOR_EMAIL}>",
     }
     print_summary(summary, settings.dry_run, report_path=settings.report_path, meta=meta)
 
