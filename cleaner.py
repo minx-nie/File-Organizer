@@ -551,7 +551,6 @@ def clean_folder(settings: OrganizerSettings) -> None:
         "Source": str(abs_path),
         "Destination": str(destination_root),
         "Mode": settings.mode,
-        "Author": f"{AUTHOR_NAME} <{AUTHOR_EMAIL}>",
     }
     print_summary(summary, settings.dry_run, report_path=settings.report_path, meta=meta)
 

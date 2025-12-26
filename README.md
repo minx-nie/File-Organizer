@@ -18,8 +18,6 @@
 
 ## 🇬🇧 English
 
-**Maintainer:** Thanh Nguyen
-
 ### Overview
 
 The upgraded **File Organizer** is a zero-dependency Python CLI that safely restructures messy folders. It ships with richer controls (copy vs move), custom destination roots, smarter configuration handling, exclusion patterns, depth limits, JSON reports, and dual-channel logging.
@@ -95,8 +93,6 @@ Workflow Diagram <img src="sample_images/workflow.png" alt="Workflow" width="600
 <a id="vietnamese"></a>
 
 ## 🇻🇳 Tiếng Việt
-
-**Người duy trì:** Thanh Nguyen — thanhnguyentuan2007@gmail.com
 
 ### Tổng quan
 
