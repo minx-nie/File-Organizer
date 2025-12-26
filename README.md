@@ -1,16 +1,39 @@
-# 📂 File Organizer
+# 📂 File Organizer 2.0
 
 <div align="center">
   <img src="https://img.shields.io/badge/Python-3.8+-blue?logo=python" alt="Python 3.8+">
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License MIT">
   <img src="https://img.shields.io/badge/Type-CLI%20Tool-orange" alt="CLI Tool">
+  <a href="https://github.com/ThanhNguyxn"><img src="https://img.shields.io/badge/Maintainer-Thanh%20Nguyen-blueviolet?logo=github" alt="Maintainer: ThanhNguyxn"></a>
 </div>
 
 ---
 
 <div align="center">
-🇬🇧 [English](#english) | 🇻🇳 [Tiếng Việt](#vietnamese)
+  <strong>🌐 Languages:</strong> 🇬🇧 <a href="#english">English</a> | 🇻🇳 <a href="#vietnamese">Tiếng Việt</a>
 </div>
+
+---
+
+## 🧭 Table of Contents
+
+- [English](#english)
+  - [Overview](#overview)
+  - [Core features](#core-features)
+  - [Safety first](#safety-first)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Configuration](#configuration)
+  - [Categories](#categories)
+  - [Visuals](#visuals)
+- [Tiếng Việt](#vietnamese)
+  - [Tổng quan](#tổng-quan)
+  - [Tính năng chính](#tính-năng-chính)
+  - [Lưu ý an toàn](#lưu-ý-an-toàn)
+  - [Cách dùng nhanh](#cách-dùng-nhanh)
+  - [Tuỳ chỉnh](#tuỳ-chỉnh)
+  - [Nhóm mặc định](#nhóm-mặc-định)
+  - [Giấy phép](#giấy-phép)
 
 ---
 
